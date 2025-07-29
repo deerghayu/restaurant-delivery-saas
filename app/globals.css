@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+@layer base {
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-orange-50 to-red-50 min-h-screen;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-lg border border-gray-300 shadow-sm transition-all duration-200 transform hover:scale-105;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent;
+  }
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #fd7e14;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #e8590c;
+}
+
+/* Animations */
+@keyframes pulse-success {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-success {
+  animation: pulse-success 2s infinite;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, transparent 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
