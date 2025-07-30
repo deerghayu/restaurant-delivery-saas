@@ -1,9 +1,11 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Bell, Plus, Users, Clock, TrendingUp, MapPin } from "lucide-react";
 
 const RestaurantDashboardHeader = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [todayStats, setTodayStats] = useState({
     ordersCompleted: 23,
     activeDrivers: 3,
@@ -11,8 +13,9 @@ const RestaurantDashboardHeader = () => {
     onTimeRate: 89,
   });
 
-  // Update clock every minute
+  // Fix hydration issue by only rendering time after component mounts
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
@@ -47,6 +50,25 @@ const RestaurantDashboardHeader = () => {
     return "Working late";
   };
 
+  // Format date consistently for server/client
+  const formatDate = (date: Date) => {
+    if (!mounted) return "Loading...";
+    return date.toLocaleDateString("en-AU", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const formatTime = (date: Date) => {
+    if (!mounted) return "Loading...";
+    return date.toLocaleTimeString("en-AU", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
       {/* Main Header */}
@@ -65,11 +87,7 @@ const RestaurantDashboardHeader = () => {
               <p className="text-orange-100 text-sm">
                 {getTimeBasedGreeting()}, Tony!
                 <span className="ml-2 text-xs opacity-75">
-                  {currentTime.toLocaleDateString("en-AU", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "short",
-                  })}
+                  {formatDate(currentTime)}
                 </span>
               </p>
             </div>
@@ -196,13 +214,7 @@ const RestaurantDashboardHeader = () => {
           {/* Right: Time */}
           <div className="text-orange-200 flex items-center space-x-1">
             <Clock size={14} className="text-orange-300" />
-            <span className="font-mono">
-              {currentTime.toLocaleTimeString("en-AU", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })}
-            </span>
+            <span className="font-mono">{formatTime(currentTime)}</span>
           </div>
         </div>
       </div>

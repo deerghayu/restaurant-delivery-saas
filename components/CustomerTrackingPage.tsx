@@ -2,8 +2,32 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Clock, Phone, Star, Truck, CheckCircle } from "lucide-react";
 
-const CustomerTrackingPage = ({ orderId }: { orderId: string }) => {
+const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false); // ← This fixes hydration
+
+  // Safety check for orderId
+  if (!orderId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Order Not Found
+          </h1>
+          <p className="text-gray-600 mb-4">
+            Please check your order ID and try again.
+          </p>
+          <a
+            href="/"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   // Mock order data - would come from API
   const orderData = {
@@ -54,14 +78,18 @@ const CustomerTrackingPage = ({ orderId }: { orderId: string }) => {
     ],
   };
 
+  // Fix hydration issue by only rendering time after component mounts
   useEffect(() => {
+    setMounted(true); // ← This sets mounted to true after hydration
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
     return () => clearInterval(timer);
   }, []);
 
+  // These functions now check if component is mounted before calculating time
   const getTimeUntil = (date: Date) => {
+    if (!mounted) return "Loading..."; // ← Prevents hydration mismatch
     const minutes = Math.floor(
       (date.getTime() - currentTime.getTime()) / 60000
     );
@@ -72,12 +100,18 @@ const CustomerTrackingPage = ({ orderId }: { orderId: string }) => {
   };
 
   const getTimeAgo = (date: Date) => {
+    if (!mounted) return "Loading..."; // ← Prevents hydration mismatch
     const minutes = Math.floor(
       (currentTime.getTime() - date.getTime()) / 60000
     );
     if (minutes < 1) return "Just now";
     if (minutes === 1) return "1 minute ago";
     return `${minutes} minutes ago`;
+  };
+
+  // Safe function to get order display ID
+  const getOrderDisplayId = (id: string) => {
+    return id && id.length >= 4 ? id.slice(-4) : id || "N/A";
   };
 
   return (
@@ -92,7 +126,7 @@ const CustomerTrackingPage = ({ orderId }: { orderId: string }) => {
             <div>
               <h1 className="text-3xl font-bold">{orderData.restaurantName}</h1>
               <p className="text-orange-100">
-                Order #{orderId.slice(-4)} • Track Your Delivery
+                Order #{getOrderDisplayId(orderId)} • Track Your Delivery
               </p>
             </div>
           </div>

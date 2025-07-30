@@ -1,3 +1,4 @@
+"use client";
 import RestaurantDashboardHeader from "@/components/RestaurantDashboardHeader";
 import OrderStatusBoard from "@/components/OrderStatusBoard";
 
