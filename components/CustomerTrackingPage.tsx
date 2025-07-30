@@ -1,10 +1,119 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, Phone, Star, Truck, CheckCircle } from "lucide-react";
+import { MapPin, Clock, Phone, Star, Truck, CheckCircle, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [mounted, setMounted] = useState(false); // ← This fixes hydration
+  const [mounted, setMounted] = useState(false);
+  const [orderData, setOrderData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch order data from Supabase
+  const fetchOrderData = async () => {
+    if (!orderId) return;
+
+    try {
+      // Fetch order details with restaurant info
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          restaurants(name),
+          order_tracking(*)
+        `)
+        .eq('id', orderId)
+        .single();
+
+      if (orderError) {
+        console.error('Error fetching order:', orderError);
+        setError('Order not found');
+        setLoading(false);
+        return;
+      }
+
+      if (!order) {
+        setError('Order not found');
+        setLoading(false);
+        return;
+      }
+
+      // Transform the data for display
+      const transformedData = {
+        id: order.id,
+        restaurantName: order.restaurants?.name || 'Restaurant',
+        restaurantLogo: "🍕",
+        customerName: order.customer_name,
+        status: order.status,
+        estimatedDelivery: new Date(Date.now() + 15 * 60000), // 15 minutes from now (mock)
+        items: order.items.split(', ').map((item: string) => {
+          const [quantity, ...nameParts] = item.split('x ');
+          return {
+            name: nameParts.join('x ').trim(),
+            quantity: parseInt(quantity) || 1,
+            price: 0 // We don't store individual prices, so use 0
+          };
+        }),
+        total: order.total_amount,
+        driver: {
+          name: "James", // Mock data
+          phone: "0467 234 567",
+          avatar: "👨",
+          rating: 4.9,
+        },
+        deliveryAddress: order.customer_address,
+        timeline: generateTimeline(order.status, order.created_at),
+      };
+
+      setOrderData(transformedData);
+    } catch (error) {
+      console.error('Error in fetchOrderData:', error);
+      setError('Failed to load order details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Generate timeline based on order status
+  const generateTimeline = (status: string, createdAt: string) => {
+    const orderTime = new Date(createdAt);
+    const timeline = [
+      {
+        status: "Order Confirmed",
+        time: orderTime,
+        completed: true,
+        description: "Your order has been received and confirmed",
+      },
+    ];
+
+    if (status !== 'pending') {
+      timeline.push({
+        status: "In Kitchen",
+        time: new Date(orderTime.getTime() + 10 * 60000), // 10 mins after order
+        completed: true,
+        description: "Our chefs are preparing your delicious meal",
+      });
+    }
+
+    if (status === 'out_for_delivery' || status === 'delivered') {
+      timeline.push({
+        status: "Out for Delivery",
+        time: new Date(orderTime.getTime() + 25 * 60000), // 25 mins after order
+        completed: true,
+        description: "Your order is on its way",
+      });
+    }
+
+    timeline.push({
+      status: "Delivered",
+      time: new Date(Date.now() + 15 * 60000), // 15 mins from now
+      completed: status === 'delivered',
+      description: "Enjoy your meal!",
+    });
+
+    return timeline;
+  };
 
   // Safety check for orderId
   if (!orderId) {
@@ -29,63 +138,19 @@ const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
     );
   }
 
-  // Mock order data - would come from API
-  const orderData = {
-    id: orderId,
-    restaurantName: "Mario's Pizza",
-    restaurantLogo: "🍕",
-    customerName: "Sarah Johnson",
-    status: "out_for_delivery",
-    estimatedDelivery: new Date(Date.now() + 8 * 60000), // 8 minutes from now
-    items: [
-      { name: "Margherita Pizza (Large)", quantity: 2, price: 32.0 },
-      { name: "Garlic Bread", quantity: 1, price: 8.5 },
-      { name: "Coca Cola", quantity: 2, price: 6.0 },
-    ],
-    total: 46.5,
-    driver: {
-      name: "James",
-      phone: "0467 234 567",
-      avatar: "👨",
-      rating: 4.9,
-    },
-    deliveryAddress: "45 Collins St, Melbourne VIC 3000",
-    timeline: [
-      {
-        status: "Order Confirmed",
-        time: new Date(Date.now() - 35 * 60000),
-        completed: true,
-        description: "Your order has been received and is being prepared",
-      },
-      {
-        status: "In Kitchen",
-        time: new Date(Date.now() - 25 * 60000),
-        completed: true,
-        description: "Our chefs are preparing your delicious meal",
-      },
-      {
-        status: "Out for Delivery",
-        time: new Date(Date.now() - 8 * 60000),
-        completed: true,
-        description: "Your order is on its way with James",
-      },
-      {
-        status: "Delivered",
-        time: new Date(Date.now() + 8 * 60000),
-        completed: false,
-        description: "Enjoy your meal!",
-      },
-    ],
-  };
-
   // Fix hydration issue by only rendering time after component mounts
   useEffect(() => {
-    setMounted(true); // ← This sets mounted to true after hydration
+    setMounted(true);
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // Fetch order data on component mount
+  useEffect(() => {
+    fetchOrderData();
+  }, [orderId]);
 
   // These functions now check if component is mounted before calculating time
   const getTimeUntil = (date: Date) => {
@@ -113,6 +178,51 @@ const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
   const getOrderDisplayId = (id: string) => {
     return id && id.length >= 4 ? id.slice(-4) : id || "N/A";
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading order details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !orderData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
+          <div className="text-6xl mb-4">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {error || 'Order Not Found'}
+          </h1>
+          <p className="text-gray-600 mb-4">
+            {error === 'Order not found' 
+              ? 'Please check your order ID and try again.'
+              : 'There was an issue loading your order details.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors mr-4"
+          >
+            Try Again
+          </button>
+          <a
+            href="/"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
@@ -256,9 +366,6 @@ const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
                       <div className="font-medium text-gray-900">
                         {item.quantity}x {item.name}
                       </div>
-                    </div>
-                    <div className="font-semibold text-gray-900">
-                      ${item.price.toFixed(2)}
                     </div>
                   </div>
                 ))}

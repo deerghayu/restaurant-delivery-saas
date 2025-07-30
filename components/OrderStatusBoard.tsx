@@ -12,82 +12,22 @@ import {
   DollarSign,
   Navigation
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
-const OrderStatusBoard = () => {
+interface OrderStatusBoardProps {
+  newOrder?: any | null;
+}
+
+const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
+  const { restaurant } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Mock order data - in real app, this comes from API
+  const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState({
-    pending: [
-      {
-        id: 'ORD_12346',
-        customerName: 'Sarah Johnson',
-        customerPhone: '0412 345 678',
-        customerAddress: '45 Collins St, Melbourne',
-        items: ['2x Margherita Pizza', '1x Garlic Bread', '2x Coke'],
-        total: 42.50,
-        orderTime: new Date(Date.now() - 8 * 60000), // 8 minutes ago
-        estimatedReady: new Date(Date.now() + 7 * 60000), // 7 minutes from now
-        priority: 'normal',
-        specialInstructions: 'Extra cheese, no onions'
-      },
-      {
-        id: 'ORD_12347',
-        customerName: 'Mike Chen',
-        customerPhone: '0423 456 789',
-        customerAddress: '123 Swanston St, Melbourne',
-        items: ['1x Supreme Pizza', '1x Caesar Salad'],
-        total: 38.90,
-        orderTime: new Date(Date.now() - 3 * 60000), // 3 minutes ago
-        estimatedReady: new Date(Date.now() + 12 * 60000), // 12 minutes from now
-        priority: 'high',
-        specialInstructions: 'Call when arriving - apartment building'
-      }
-    ],
-    assigned: [
-      {
-        id: 'ORD_12345',
-        customerName: 'David Wilson',
-        customerPhone: '0434 567 890',
-        customerAddress: '789 Chapel St, Melbourne',
-        items: ['1x Hawaiian Pizza', '1x Chicken Wings'],
-        total: 35.80,
-        orderTime: new Date(Date.now() - 25 * 60000), // 25 minutes ago
-        driver: { name: 'Emma', phone: '0445 123 456', avatar: '👩' },
-        status: 'preparing',
-        estimatedPickup: new Date(Date.now() + 3 * 60000), // 3 minutes from now
-        estimatedDelivery: new Date(Date.now() + 18 * 60000) // 18 minutes from now
-      }
-    ],
-    outForDelivery: [
-      {
-        id: 'ORD_12344',
-        customerName: 'Lisa Brown',
-        customerPhone: '0456 789 012',
-        customerAddress: '321 Flinders St, Melbourne',
-        items: ['2x Pepperoni Pizza', '1x Garlic Bread'],
-        total: 48.70,
-        orderTime: new Date(Date.now() - 45 * 60000), // 45 minutes ago
-        driver: { name: 'James', phone: '0467 234 567', avatar: '👨' },
-        status: 'picked_up',
-        estimatedDelivery: new Date(Date.now() + 8 * 60000), // 8 minutes from now
-        actualPickupTime: new Date(Date.now() - 12 * 60000) // picked up 12 minutes ago
-      },
-      {
-        id: 'ORD_12343',
-        customerName: 'Tom Anderson',
-        customerPhone: '0478 901 234',
-        customerAddress: '456 Bourke St, Melbourne',
-        items: ['1x Meat Lovers Pizza'],
-        total: 24.90,
-        orderTime: new Date(Date.now() - 35 * 60000), // 35 minutes ago
-        driver: { name: 'Sophie', phone: '0489 345 678', avatar: '👩' },
-        status: 'picked_up',
-        estimatedDelivery: new Date(Date.now() + 12 * 60000), // 12 minutes from now
-        actualPickupTime: new Date(Date.now() - 8 * 60000) // picked up 8 minutes ago
-      }
-    ]
+    pending: [] as any[],
+    assigned: [] as any[],
+    outForDelivery: [] as any[]
   });
 
   // Available drivers for assignment
@@ -98,6 +38,72 @@ const OrderStatusBoard = () => {
     { id: 'alex', name: 'Alex', avatar: '👨', phone: '0491 567 890', status: 'available' }
   ];
 
+  // Fetch orders from Supabase
+  const fetchOrders = async () => {
+    if (!restaurant) return;
+
+    try {
+      const { data: ordersData, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('restaurant_id', restaurant.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching orders:', error);
+        return;
+      }
+
+      // Transform and categorize orders
+      const transformedOrders = {
+        pending: [] as any[],
+        assigned: [] as any[],
+        outForDelivery: [] as any[]
+      };
+
+      ordersData?.forEach(order => {
+        const transformedOrder = {
+          id: order.id,
+          customerName: order.customer_name,
+          customerPhone: order.customer_phone,
+          customerAddress: order.customer_address,
+          items: order.items.split(', '),
+          total: order.total_amount,
+          orderTime: new Date(order.created_at),
+          estimatedReady: new Date(new Date(order.created_at).getTime() + 15 * 60000),
+          priority: 'normal',
+          specialInstructions: null
+        };
+
+        if (order.status === 'pending') {
+          transformedOrders.pending.push(transformedOrder);
+        } else if (order.status === 'confirmed' || order.status === 'preparing') {
+          transformedOrders.assigned.push({
+            ...transformedOrder,
+            driver: { name: 'Emma', phone: '0445 123 456', avatar: '👩' },
+            status: 'preparing',
+            estimatedPickup: new Date(Date.now() + 10 * 60000),
+            estimatedDelivery: new Date(Date.now() + 25 * 60000)
+          });
+        } else if (order.status === 'out_for_delivery') {
+          transformedOrders.outForDelivery.push({
+            ...transformedOrder,
+            driver: { name: 'James', phone: '0467 234 567', avatar: '👨' },
+            status: 'picked_up',
+            estimatedDelivery: new Date(Date.now() + 15 * 60000),
+            actualPickupTime: new Date(Date.now() - 10 * 60000)
+          });
+        }
+      });
+
+      setOrders(transformedOrders);
+    } catch (error) {
+      console.error('Error in fetchOrders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Update time every minute
   useEffect(() => {
     const timer = setInterval(() => {
@@ -105,6 +111,44 @@ const OrderStatusBoard = () => {
     }, 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // Initial fetch and setup realtime subscription
+  useEffect(() => {
+    if (restaurant) {
+      fetchOrders();
+
+      // Set up realtime subscription for order updates
+      const subscription = supabase
+        .channel('orders')
+        .on('postgres_changes', 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'orders',
+            filter: `restaurant_id=eq.${restaurant.id}`
+          }, 
+          (payload) => {
+            console.log('Order change received:', payload);
+            fetchOrders(); // Refetch orders when changes occur
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [restaurant]);
+
+  // Handle new orders from parent component
+  useEffect(() => {
+    if (newOrder) {
+      setOrders(prev => ({
+        ...prev,
+        pending: [newOrder, ...prev.pending]
+      }));
+    }
+  }, [newOrder]);
 
   // Calculate time ago
   const getTimeAgo = (date: Date) => {
@@ -136,27 +180,42 @@ const OrderStatusBoard = () => {
   };
 
   // Assign driver to order
-  const assignDriver = (orderId: string, driverId: string) => {
+  const assignDriver = async (orderId: string, driverId: string) => {
     const driver = availableDrivers.find(d => d.id === driverId);
     if (!driver || driver.status === 'busy') return;
 
-    // Move order from pending to assigned
-    setOrders(prev => {
-      const orderToMove = prev.pending.find(o => o.id === orderId);
-      if (!orderToMove) return prev;
+    try {
+      // Update order status in Supabase
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'confirmed' })
+        .eq('id', orderId);
 
-      return {
-        ...prev,
-        pending: prev.pending.filter(o => o.id !== orderId),
-        assigned: [...prev.assigned, {
-          ...orderToMove,
-          driver: driver,
-          status: 'preparing',
-          estimatedPickup: new Date(Date.now() + 10 * 60000),
-          estimatedDelivery: new Date(Date.now() + 25 * 60000)
-        }]
-      };
-    });
+      if (error) {
+        console.error('Error assigning driver:', error);
+        return;
+      }
+
+      // Update local state
+      setOrders(prev => {
+        const orderToMove = prev.pending.find(o => o.id === orderId);
+        if (!orderToMove) return prev;
+
+        return {
+          ...prev,
+          pending: prev.pending.filter(o => o.id !== orderId),
+          assigned: [...prev.assigned, {
+            ...orderToMove,
+            driver: driver,
+            status: 'preparing',
+            estimatedPickup: new Date(Date.now() + 10 * 60000),
+            estimatedDelivery: new Date(Date.now() + 25 * 60000)
+          }]
+        };
+      });
+    } catch (error) {
+      console.error('Error in assignDriver:', error);
+    }
   };
 
   const OrderCard = ({ order, status, onAssignDriver }: { 
@@ -319,6 +378,17 @@ const OrderStatusBoard = () => {
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100 min-h-screen">

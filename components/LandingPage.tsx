@@ -97,7 +97,7 @@ const LandingPage = () => {
               >
                 Demo Dashboard
               </Link>
-              <button className="btn-primary">Get Started</button>
+              <Link href="/auth" className="btn-primary">Get Started</Link>
             </div>
           </div>
         </div>
@@ -127,10 +127,10 @@ const LandingPage = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <button className="btn-primary flex items-center justify-center space-x-2">
+                <Link href="/auth" className="btn-primary flex items-center justify-center space-x-2">
                   <span>Start Free Trial</span>
                   <ArrowRight className="w-5 h-5" />
-                </button>
+                </Link>
                 <Link
                   href="/dashboard"
                   className="btn-secondary flex items-center justify-center space-x-2"
@@ -306,9 +306,9 @@ const LandingPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="px-6 py-3 rounded-lg text-gray-900 text-lg flex-1 max-w-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
-            <button className="btn-primary text-lg px-8">
+            <Link href="/auth" className="btn-primary text-lg px-8">
               Start Free Trial
-            </button>
+            </Link>
           </div>
 
           <p className="text-gray-400 text-sm">

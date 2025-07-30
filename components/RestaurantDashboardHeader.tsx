@@ -1,11 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Bell, Plus, Users, Clock, TrendingUp, MapPin } from "lucide-react";
+import { Bell, Plus, Users, Clock, TrendingUp, MapPin, LogOut, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import NewOrderModal from "./NewOrderModal";
 
-const RestaurantDashboardHeader = () => {
+interface RestaurantDashboardHeaderProps {
+  onNewOrder?: (order: any) => void;
+}
+
+const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProps) => {
+  const { user, restaurant, signOut } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNewOrderModal, setShowNewOrderModal] = useState(false);
   const [todayStats, setTodayStats] = useState({
     ordersCompleted: 23,
     activeDrivers: 3,
@@ -83,9 +92,9 @@ const RestaurantDashboardHeader = () => {
 
             {/* Greeting & Restaurant Name */}
             <div>
-              <h1 className="text-2xl font-bold">Mario's Pizza</h1>
+              <h1 className="text-2xl font-bold">{restaurant?.name || 'Restaurant Dashboard'}</h1>
               <p className="text-orange-100 text-sm">
-                {getTimeBasedGreeting()}, Tony!
+                {getTimeBasedGreeting()}, {user?.email?.split('@')[0] || 'User'}!
                 <span className="ml-2 text-xs opacity-75">
                   {formatDate(currentTime)}
                 </span>
@@ -96,7 +105,10 @@ const RestaurantDashboardHeader = () => {
           {/* Right: Quick Actions */}
           <div className="flex items-center space-x-3">
             {/* New Order Button */}
-            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition-all duration-200 transform hover:scale-105 flex items-center space-x-2">
+            <button 
+              onClick={() => setShowNewOrderModal(true)}
+              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
+            >
               <Plus size={20} />
               <span>New Order</span>
             </button>
@@ -121,6 +133,35 @@ const RestaurantDashboardHeader = () => {
               <span className="text-sm font-medium">
                 {isOnline ? "Online" : "Offline"}
               </span>
+            </div>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="bg-orange-600 bg-opacity-70 hover:bg-opacity-90 p-3 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+              >
+                <User size={20} />
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-200">
+                    <p className="text-sm text-gray-600 font-medium">{user?.email}</p>
+                    <p className="text-xs text-gray-500">{restaurant?.name}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      signOut();
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <LogOut size={16} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -218,6 +259,16 @@ const RestaurantDashboardHeader = () => {
           </div>
         </div>
       </div>
+
+      {/* New Order Modal */}
+      <NewOrderModal
+        isOpen={showNewOrderModal}
+        onClose={() => setShowNewOrderModal(false)}
+        onOrderCreated={(order) => {
+          onNewOrder?.(order);
+          setShowNewOrderModal(false);
+        }}
+      />
     </div>
   );
 };
