@@ -51,6 +51,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (restaurant) {
+      // Restaurant exists - populate from database
       setFormData({
         name: restaurant.name || '',
         email: restaurant.email || '',
@@ -66,8 +67,53 @@ export default function SettingsPage() {
         delivery_fee: restaurant.delivery_fee || 5.00,
         business_hours: restaurant.business_hours || BUSINESS_HOURS_TEMPLATE
       });
+    } else if (user) {
+      // No restaurant but user exists - populate from user's signup data
+      const fetchUserRestaurantData = async () => {
+        try {
+          // Try to find existing restaurant record created during signup
+          const { data: existingRestaurant } = await supabase
+            .from('restaurants')
+            .select('*')
+            .eq('email', user.email)
+            .single();
+
+          if (existingRestaurant) {
+            setFormData({
+              name: existingRestaurant.name || '',
+              email: existingRestaurant.email || user.email || '',
+              phone: existingRestaurant.phone || '',
+              street_address: existingRestaurant.street_address || '',
+              suburb: existingRestaurant.suburb || '',
+              state: existingRestaurant.state || '',
+              postcode: existingRestaurant.postcode || '',
+              primary_color: existingRestaurant.primary_color || '#ea580c',
+              average_prep_time: existingRestaurant.average_prep_time || 15,
+              delivery_radius: existingRestaurant.delivery_radius || 10,
+              minimum_order: existingRestaurant.minimum_order || 25.00,
+              delivery_fee: existingRestaurant.delivery_fee || 5.00,
+              business_hours: existingRestaurant.business_hours || BUSINESS_HOURS_TEMPLATE
+            });
+          } else {
+            // Just populate email from user account
+            setFormData(prev => ({
+              ...prev,
+              email: user.email || ''
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching user restaurant data:', error);
+          // Fallback to just email
+          setFormData(prev => ({
+            ...prev,
+            email: user.email || ''
+          }));
+        }
+      };
+
+      fetchUserRestaurantData();
     }
-  }, [restaurant]);
+  }, [restaurant, user]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -94,24 +140,27 @@ export default function SettingsPage() {
     try {
       if (!restaurant?.id) {
         // Create a new restaurant record if none exists
+        const createData = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          street_address: formData.street_address,
+          suburb: formData.suburb,
+          state: formData.state,
+          postcode: formData.postcode,
+          primary_color: formData.primary_color,
+          average_prep_time: formData.average_prep_time,
+          delivery_radius: formData.delivery_radius,
+          minimum_order: formData.minimum_order,
+          delivery_fee: formData.delivery_fee,
+          business_hours: formData.business_hours
+        };
+        
+        console.log('Creating restaurant with data:', createData);
         
         const { data: newRestaurant, error: createError } = await supabase
           .from('restaurants')
-          .insert([{
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            street_address: formData.street_address,
-            suburb: formData.suburb,
-            state: formData.state,
-            postcode: formData.postcode,
-            primary_color: formData.primary_color,
-            average_prep_time: formData.average_prep_time,
-            delivery_radius: formData.delivery_radius,
-            minimum_order: formData.minimum_order,
-            delivery_fee: formData.delivery_fee,
-            business_hours: formData.business_hours
-          }])
+          .insert([createData])
           .select()
           .single();
 
@@ -134,39 +183,49 @@ export default function SettingsPage() {
         }
 
         setMessage({ type: 'success', text: 'Restaurant profile created successfully!' });
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
       } else {
         // Update existing restaurant
+        const updateData = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          street_address: formData.street_address,
+          suburb: formData.suburb,
+          state: formData.state,
+          postcode: formData.postcode,
+          primary_color: formData.primary_color,
+          average_prep_time: formData.average_prep_time,
+          delivery_radius: formData.delivery_radius,
+          minimum_order: formData.minimum_order,
+          delivery_fee: formData.delivery_fee,
+          business_hours: formData.business_hours,
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log('Updating restaurant with data:', updateData);
+        
         const { error } = await supabase
           .from('restaurants')
-          .update({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            street_address: formData.street_address,
-            suburb: formData.suburb,
-            state: formData.state,
-            postcode: formData.postcode,
-            primary_color: formData.primary_color,
-            average_prep_time: formData.average_prep_time,
-            delivery_radius: formData.delivery_radius,
-            minimum_order: formData.minimum_order,
-            delivery_fee: formData.delivery_fee,
-            business_hours: formData.business_hours,
-            updated_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', restaurant.id);
 
         if (error) {
           setMessage({ type: 'error', text: error.message });
         } else {
           setMessage({ type: 'success', text: 'Restaurant profile updated successfully!' });
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            setMessage(null);
+          }, 3000);
         }
       }
       
-      // Refresh the page to reload restaurant data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Success - no page refresh needed
+      console.log('Restaurant data saved successfully');
       
     } catch (err) {
       setMessage({ type: 'error', text: 'An unexpected error occurred' });

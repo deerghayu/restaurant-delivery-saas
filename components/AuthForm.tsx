@@ -49,7 +49,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
         if (error) {
           setError(error.message);
         } else {
-          // TODO: Re-enable email confirmation for production
+          // Skip email confirmation for MVP - re-enable for production
           // if (data?.user && !data.user.email_confirmed_at) {
           //   setError('Please check your email and click the confirmation link before signing in.');
           // } else {
