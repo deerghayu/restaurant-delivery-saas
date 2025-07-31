@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Bell, Plus, Users, Clock, TrendingUp, MapPin, LogOut, User } from "lucide-react";
+import { Bell, Plus, Users, Clock, TrendingUp, MapPin, LogOut, User, Settings } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import NewOrderModal from "./NewOrderModal";
 
@@ -150,6 +151,14 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
                     <p className="text-sm text-gray-600 font-medium">{user?.email}</p>
                     <p className="text-xs text-gray-500">{restaurant?.name}</p>
                   </div>
+                  <Link
+                    href="/settings"
+                    onClick={() => setShowUserMenu(false)}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <Settings size={16} />
+                    <span>Settings</span>
+                  </Link>
                   <button
                     onClick={() => {
                       setShowUserMenu(false);

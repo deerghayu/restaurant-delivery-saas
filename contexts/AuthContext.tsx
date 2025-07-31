@@ -22,35 +22,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [restaurant, setRestaurant] = useState<any | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    
+    // Set a timeout fallback to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (mounted) {
+        setLoading(false);
+      }
+    }, 2000);
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Fetch restaurant data in background after setting loading to false
       if (session?.user) {
         fetchRestaurant(session.user.id);
       }
-      setLoading(false);
+      
+      if (mounted) {
+        setLoading(false);
+        clearTimeout(loadingTimeout);
+      }
+    }).catch(error => {
+      console.error('Error getting initial session:', error);
+      if (mounted) {
+        setLoading(false);
+        clearTimeout(loadingTimeout);
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
+      
       if (session?.user) {
-        await fetchRestaurant(session.user.id);
+        fetchRestaurant(session.user.id);
       } else {
         setRestaurant(null);
       }
-      setLoading(false);
+      
+      if (mounted) {
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchRestaurant = async (userId: string) => {
     try {
+      
       // First check if user is linked to a restaurant via restaurant_users
       const { data: restaurantUser, error: userError } = await supabase
         .from('restaurant_users')
@@ -58,16 +92,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', userId)
         .single();
 
-      if (userError && userError.code !== 'PGRST116') {
-        console.error('Error fetching restaurant user:', userError);
+      if (userError) {
+        if (userError.code === 'PGRST116') {
+          // No restaurant found - this is OK for new users
+          setRestaurant(null);
+        } else {
+          console.error('Error fetching restaurant user:', userError);
+          setRestaurant(null);
+        }
         return;
       }
 
-      if (restaurantUser) {
+      if (restaurantUser && restaurantUser.restaurants) {
         setRestaurant(restaurantUser.restaurants);
+      } else {
+        setRestaurant(null);
       }
     } catch (error) {
       console.error('Error in fetchRestaurant:', error);
+      setRestaurant(null);
     }
   };
 
