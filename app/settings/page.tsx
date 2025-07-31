@@ -28,7 +28,7 @@ const BUSINESS_HOURS_TEMPLATE = {
 };
 
 export default function SettingsPage() {
-  const { restaurant } = useAuth();
+  const { restaurant, user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -87,37 +87,87 @@ export default function SettingsPage() {
   };
 
   const handleSave = async () => {
-    if (!restaurant?.id) return;
     
     setSaving(true);
     setMessage(null);
 
     try {
-      const { error } = await supabase
-        .from('restaurants')
-        .update({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          street_address: formData.street_address,
-          suburb: formData.suburb,
-          state: formData.state,
-          postcode: formData.postcode,
-          primary_color: formData.primary_color,
-          average_prep_time: formData.average_prep_time,
-          delivery_radius: formData.delivery_radius,
-          minimum_order: formData.minimum_order,
-          delivery_fee: formData.delivery_fee,
-          business_hours: formData.business_hours,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', restaurant.id);
+      if (!restaurant?.id) {
+        // Create a new restaurant record if none exists
+        
+        const { data: newRestaurant, error: createError } = await supabase
+          .from('restaurants')
+          .insert([{
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            street_address: formData.street_address,
+            suburb: formData.suburb,
+            state: formData.state,
+            postcode: formData.postcode,
+            primary_color: formData.primary_color,
+            average_prep_time: formData.average_prep_time,
+            delivery_radius: formData.delivery_radius,
+            minimum_order: formData.minimum_order,
+            delivery_fee: formData.delivery_fee,
+            business_hours: formData.business_hours
+          }])
+          .select()
+          .single();
 
-      if (error) {
-        setMessage({ type: 'error', text: error.message });
+        if (createError) {
+          setMessage({ type: 'error', text: createError.message });
+          return;
+        }
+
+        // Link user to restaurant
+        const { error: linkError } = await supabase
+          .from('restaurant_users')
+          .insert([{
+            restaurant_id: newRestaurant.id,
+            user_id: user.id,
+            role: 'owner'
+          }]);
+
+        if (linkError) {
+          console.error('Error linking user to restaurant:', linkError);
+        }
+
+        setMessage({ type: 'success', text: 'Restaurant profile created successfully!' });
       } else {
-        setMessage({ type: 'success', text: 'Restaurant profile updated successfully!' });
+        // Update existing restaurant
+        const { error } = await supabase
+          .from('restaurants')
+          .update({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            street_address: formData.street_address,
+            suburb: formData.suburb,
+            state: formData.state,
+            postcode: formData.postcode,
+            primary_color: formData.primary_color,
+            average_prep_time: formData.average_prep_time,
+            delivery_radius: formData.delivery_radius,
+            minimum_order: formData.minimum_order,
+            delivery_fee: formData.delivery_fee,
+            business_hours: formData.business_hours,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', restaurant.id);
+
+        if (error) {
+          setMessage({ type: 'error', text: error.message });
+        } else {
+          setMessage({ type: 'success', text: 'Restaurant profile updated successfully!' });
+        }
       }
+      
+      // Refresh the page to reload restaurant data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
     } catch (err) {
       setMessage({ type: 'error', text: 'An unexpected error occurred' });
     } finally {

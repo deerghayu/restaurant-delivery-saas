@@ -64,34 +64,38 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
       ordersData?.forEach(order => {
         const transformedOrder = {
           id: order.id,
+          orderNumber: order.order_number,
           customerName: order.customer_name,
           customerPhone: order.customer_phone,
-          customerAddress: order.customer_address,
-          items: order.items.split(', '),
+          customerAddress: order.delivery_address,
+          items: Array.isArray(order.items) ? order.items : [],
+          subtotal: order.subtotal,
+          deliveryFee: order.delivery_fee,
           total: order.total_amount,
           orderTime: new Date(order.created_at),
-          estimatedReady: new Date(new Date(order.created_at).getTime() + 15 * 60000),
-          priority: 'normal',
-          specialInstructions: null
+          estimatedReady: order.estimated_ready_at ? new Date(order.estimated_ready_at) : new Date(new Date(order.created_at).getTime() + 15 * 60000),
+          priority: order.priority || 'normal',
+          specialInstructions: order.special_instructions,
+          status: order.status
         };
 
         if (order.status === 'pending') {
           transformedOrders.pending.push(transformedOrder);
-        } else if (order.status === 'confirmed' || order.status === 'preparing') {
+        } else if (order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready') {
           transformedOrders.assigned.push({
             ...transformedOrder,
             driver: { name: 'Emma', phone: '0445 123 456', avatar: '👩' },
-            status: 'preparing',
+            status: order.status,
             estimatedPickup: new Date(Date.now() + 10 * 60000),
             estimatedDelivery: new Date(Date.now() + 25 * 60000)
           });
-        } else if (order.status === 'out_for_delivery') {
+        } else if (order.status === 'picked_up' || order.status === 'out_for_delivery') {
           transformedOrders.outForDelivery.push({
             ...transformedOrder,
             driver: { name: 'James', phone: '0467 234 567', avatar: '👨' },
-            status: 'picked_up',
+            status: order.status,
             estimatedDelivery: new Date(Date.now() + 15 * 60000),
-            actualPickupTime: new Date(Date.now() - 10 * 60000)
+            actualPickupTime: order.picked_up_at ? new Date(order.picked_up_at) : new Date(Date.now() - 10 * 60000)
           });
         }
       });
@@ -179,16 +183,73 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
     }
   };
 
+  // Update order status
+  const updateOrderStatus = async (orderId: string, newStatus: string, notes?: string) => {
+    try {
+      const updateData: any = { 
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      };
+
+      // Set timestamps based on status
+      if (newStatus === 'confirmed') {
+        updateData.confirmed_at = new Date().toISOString();
+      } else if (newStatus === 'ready') {
+        updateData.ready_at = new Date().toISOString();
+      } else if (newStatus === 'picked_up') {
+        updateData.picked_up_at = new Date().toISOString();
+      } else if (newStatus === 'delivered') {
+        updateData.delivered_at = new Date().toISOString();
+      }
+
+      // Update order status in Supabase
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update(updateData)
+        .eq('id', orderId);
+
+      if (orderError) {
+        console.error('Error updating order status:', orderError);
+        return;
+      }
+
+      // Add tracking record
+      const { error: trackingError } = await supabase
+        .from('order_tracking')
+        .insert([
+          {
+            order_id: orderId,
+            status: newStatus,
+            notes: notes || `Order ${newStatus.replace('_', ' ')}`
+          }
+        ]);
+
+      if (trackingError) {
+        console.error('Error adding tracking record:', trackingError);
+      }
+
+      // Refresh orders
+      fetchOrders();
+    } catch (error) {
+      console.error('Error in updateOrderStatus:', error);
+    }
+  };
+
   // Assign driver to order
   const assignDriver = async (orderId: string, driverId: string) => {
     const driver = availableDrivers.find(d => d.id === driverId);
     if (!driver || driver.status === 'busy') return;
 
     try {
-      // Update order status in Supabase
+      // Update order with driver assignment
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'confirmed' })
+        .update({ 
+          status: 'confirmed',
+          assigned_at: new Date().toISOString(),
+          confirmed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
         .eq('id', orderId);
 
       if (error) {
@@ -196,25 +257,32 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
         return;
       }
 
-      // Update local state
-      setOrders(prev => {
-        const orderToMove = prev.pending.find(o => o.id === orderId);
-        if (!orderToMove) return prev;
+      // Add tracking record
+      await supabase
+        .from('order_tracking')
+        .insert([
+          {
+            order_id: orderId,
+            status: 'confirmed',
+            notes: `Assigned to ${driver.name}`
+          }
+        ]);
 
-        return {
-          ...prev,
-          pending: prev.pending.filter(o => o.id !== orderId),
-          assigned: [...prev.assigned, {
-            ...orderToMove,
-            driver: driver,
-            status: 'preparing',
-            estimatedPickup: new Date(Date.now() + 10 * 60000),
-            estimatedDelivery: new Date(Date.now() + 25 * 60000)
-          }]
-        };
-      });
+      // Refresh orders
+      fetchOrders();
     } catch (error) {
       console.error('Error in assignDriver:', error);
+    }
+  };
+
+  // Cancel order
+  const cancelOrder = async (orderId: string, reason?: string) => {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+
+    try {
+      await updateOrderStatus(orderId, 'cancelled', reason || 'Cancelled by restaurant');
+    } catch (error) {
+      console.error('Error cancelling order:', error);
     }
   };
 
@@ -276,7 +344,7 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
           <div className="space-y-1">
             {order.items.map((item, index) => (
               <div key={index} className="text-sm text-gray-800 font-medium">
-                • {item}
+                • {typeof item === 'object' ? `${item.quantity}x ${item.name}` : item}
               </div>
             ))}
           </div>
@@ -296,25 +364,45 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                 <span className="font-medium">Ready in: <strong className="text-orange-600">{getTimeUntil(order.estimatedReady)}</strong></span>
               </div>
             </div>
-            <div className="space-y-2">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">Choose your driver:</label>
-              <div className="grid grid-cols-2 gap-2">
-                {availableDrivers.filter(d => d.status === 'available').map(driver => (
-                  <button
-                    key={driver.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAssignDriver(order.id, driver.id);
-                    }}
-                    className="flex items-center space-x-2 p-3 bg-blue-500 hover:bg-blue-600 border border-blue-600 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md text-white"
-                  >
-                    <span className="text-xl">{driver.avatar}</span>
-                    <span className="text-sm font-semibold">{driver.name}</span>
-                  </button>
-                ))}
+            <div className="space-y-3">
+              <div className="flex space-x-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateOrderStatus(order.id, 'confirmed', 'Order confirmed and preparing');
+                  }}
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Confirm Order
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cancelOrder(order.id);
+                  }}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
+                </button>
               </div>
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Choose driver:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {availableDrivers.filter(d => d.status === 'available').map(driver => (
+                    <button
+                      key={driver.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        assignDriver(order.id, driver.id);
+                      }}
+                      className="flex items-center space-x-2 p-3 bg-blue-500 hover:bg-blue-600 border border-blue-600 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md text-white"
+                    >
+                      <span className="text-xl">{driver.avatar}</span>
+                      <span className="text-sm font-semibold">{driver.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -340,8 +428,23 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
             </div>
             <div className="mt-3">
               <div className="flex space-x-2">
-                <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateOrderStatus(order.id, 'ready', 'Order ready for pickup');
+                  }}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                >
                   Ready for Pickup
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateOrderStatus(order.id, 'picked_up', 'Order picked up by driver');
+                  }}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Picked Up
                 </button>
               </div>
             </div>
@@ -368,7 +471,13 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
               </div>
             </div>
             <div className="mt-3">
-              <button className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateOrderStatus(order.id, 'delivered', 'Order delivered successfully');
+                }}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
+              >
                 <CheckCircle size={16} />
                 <span>Mark as Delivered</span>
               </button>

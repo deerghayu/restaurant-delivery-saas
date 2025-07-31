@@ -80,8 +80,15 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    
     if (!restaurant) {
-      setError('Restaurant information not available');
+      setError('Restaurant information not available. Please ensure you have completed your restaurant profile in Settings.');
+      return;
+    }
+    
+    if (!restaurant.id) {
+      setError('Restaurant ID not found. Please contact support.');
       return;
     }
 
@@ -110,10 +117,13 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
         return;
       }
 
-      // Format items for storage
-      const itemsString = validItems.map(item => 
-        `${item.quantity}x ${item.name}`
-      ).join(', ');
+      // Generate order number
+      const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
+      
+      // Calculate fees
+      const deliveryFee = restaurant.delivery_fee || 5.00;
+      const subtotal = total;
+      const totalWithDelivery = subtotal + deliveryFee;
 
       // Create order in Supabase
       const { data: orderData, error: orderError } = await supabase
@@ -121,12 +131,19 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
         .insert([
           {
             restaurant_id: restaurant.id,
+            order_number: orderNumber,
             customer_name: customerName.trim(),
             customer_phone: customerPhone.trim(),
-            customer_address: customerAddress.trim(),
-            items: itemsString,
-            total_amount: total,
-            status: 'pending'
+            customer_email: null,
+            delivery_address: customerAddress.trim(),
+            items: validItems,
+            subtotal: subtotal,
+            delivery_fee: deliveryFee,
+            total_amount: totalWithDelivery,
+            special_instructions: specialInstructions.trim() || null,
+            status: 'pending',
+            priority: 'normal',
+            estimated_ready_at: new Date(Date.now() + (restaurant.average_prep_time || 15) * 60000).toISOString()
           }
         ])
         .select()
@@ -143,7 +160,7 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
           {
             order_id: orderData.id,
             status: 'pending',
-            location: 'Restaurant'
+            notes: 'Order received'
           }
         ]);
 
@@ -155,15 +172,19 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
       // Transform the data to match the expected format
       const formattedOrder = {
         id: orderData.id,
+        orderNumber: orderData.order_number,
         customerName: orderData.customer_name,
         customerPhone: orderData.customer_phone,
-        customerAddress: orderData.customer_address,
-        items: validItems.map(item => `${item.quantity}x ${item.name}`),
+        customerAddress: orderData.delivery_address,
+        items: orderData.items,
+        subtotal: orderData.subtotal,
+        deliveryFee: orderData.delivery_fee,
         total: orderData.total_amount,
         orderTime: new Date(orderData.created_at),
-        estimatedReady: new Date(Date.now() + 15 * 60000), // 15 minutes from now
-        priority: 'normal',
-        specialInstructions: specialInstructions.trim() || null
+        estimatedReady: new Date(orderData.estimated_ready_at),
+        priority: orderData.priority,
+        specialInstructions: orderData.special_instructions,
+        status: orderData.status
       };
 
       onOrderCreated(formattedOrder);
@@ -221,7 +242,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                  style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                   placeholder="John Smith"
                   required
                 />
@@ -235,7 +257,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                   type="tel"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                  style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                   placeholder="0412 345 678"
                   required
                 />
@@ -249,7 +272,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
               <textarea
                 value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+              style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                 placeholder="123 Main St, Melbourne VIC 3000"
                 rows={2}
                 required
@@ -288,7 +312,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                       type="text"
                       value={item.name}
                       onChange={(e) => updateItem(index, 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                  style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                       placeholder="Pizza, Salad, etc."
                       required
                     />
@@ -321,7 +346,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                         min="1"
                         value={item.quantity}
                         onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                  style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                         required
                       />
                     </div>
@@ -336,7 +362,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                         step="0.01"
                         value={item.price}
                         onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                  style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
                         placeholder="0.00"
                         required
                       />
@@ -364,7 +391,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
             <textarea
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+              style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
               placeholder="Extra cheese, no onions, call when arriving..."
               rows={3}
             />
