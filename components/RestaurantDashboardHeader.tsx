@@ -4,6 +4,7 @@ import { Bell, Plus, Users, Clock, TrendingUp, MapPin, LogOut, User, Settings } 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import NewOrderModal from "./NewOrderModal";
+import { getBrandColor, getRestaurantDisplayName } from "@/utils/restaurant";
 
 interface RestaurantDashboardHeaderProps {
   onNewOrder?: (order: any) => void;
@@ -32,19 +33,41 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
     return () => clearInterval(timer);
   }, []);
 
-  // Emotional messaging based on performance
+  // Enhanced emotional messaging based on performance and context
   const getPerformanceMessage = () => {
-    if (todayStats.onTimeRate >= 85) {
+    const hour = currentTime.getHours();
+    const isLunchRush = hour >= 11 && hour <= 14;
+    const isDinnerRush = hour >= 17 && hour <= 21;
+    
+    if (todayStats.onTimeRate >= 90) {
       return {
-        text: "Excellent delivery performance today! 🎉",
+        text: "🌟 Outstanding! Your customers are absolutely delighted today!",
         mood: "celebrating",
+        bgColor: "bg-gradient-to-r from-green-400 to-emerald-500",
+        textColor: "text-white"
+      };
+    } else if (todayStats.onTimeRate >= 85) {
+      return {
+        text: `🎉 Fantastic work! ${todayStats.ordersCompleted} happy customers served today!`,
+        mood: "celebrating",
+        bgColor: "bg-gradient-to-r from-green-300 to-green-400",
+        textColor: "text-white"
       };
     } else if (todayStats.onTimeRate >= 70) {
-      return { text: "Good delivery pace today 👍", mood: "steady" };
+      const rushMessage = isLunchRush ? "Great lunch rush handling!" : isDinnerRush ? "Dinner service looking good!" : "Steady rhythm today!";
+      return { 
+        text: `👍 ${rushMessage} Your kitchen crew is doing well!`, 
+        mood: "steady",
+        bgColor: "bg-gradient-to-r from-blue-400 to-blue-500",
+        textColor: "text-white"
+      };
     } else {
+      const encouragement = todayStats.ordersCompleted > 10 ? "Busy day - let's fine-tune the flow!" : "Every great restaurant has room to grow!";
       return {
-        text: "Let's optimize delivery times today 💪",
+        text: `💪 ${encouragement} Your team's got this!`,
         mood: "improving",
+        bgColor: "bg-gradient-to-r from-orange-400 to-amber-500",
+        textColor: "text-white"
       };
     }
   };
@@ -79,8 +102,15 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
     });
   };
 
+  const brandColor = getBrandColor(restaurant);
+
   return (
-    <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
+    <div 
+      className="text-white shadow-lg"
+      style={{ 
+        background: `linear-gradient(to right, ${brandColor}, ${brandColor}dd)` 
+      }}
+    >
       {/* Main Header */}
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
@@ -88,16 +118,24 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
           <div className="flex items-center space-x-4">
             {/* Restaurant Logo */}
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
-              <span className="text-2xl">🍕</span>
+              {restaurant?.logo_url ? (
+                <img 
+                  src={restaurant.logo_url} 
+                  alt={`${restaurant.name} logo`}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <span className="text-2xl">🍕</span>
+              )}
             </div>
 
             {/* Greeting & Restaurant Name */}
             <div>
-              <h1 className="text-2xl font-bold">{restaurant?.name || 'Restaurant Dashboard'}</h1>
+              <h1 className="text-2xl font-bold">{getRestaurantDisplayName(restaurant)}</h1>
               <p className="text-orange-100 text-sm">
                 {getTimeBasedGreeting()}, {user?.email?.split('@')[0] || 'User'}!
                 <span className="ml-2 text-xs opacity-75">
-                  {formatDate(currentTime)}
+                  {formatDate(currentTime)} • {restaurant?.suburb}, {restaurant?.state}
                 </span>
               </p>
             </div>
@@ -152,6 +190,14 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
                     <p className="text-xs text-gray-500">{restaurant?.name}</p>
                   </div>
                   <Link
+                    href="/drivers"
+                    onClick={() => setShowUserMenu(false)}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                  >
+                    <Users size={16} />
+                    <span>Drivers</span>
+                  </Link>
+                  <Link
                     href="/settings"
                     onClick={() => setShowUserMenu(false)}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
@@ -176,69 +222,87 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
         </div>
       </div>
 
-      {/* Performance Stats Bar */}
-      <div className="bg-red-600 bg-opacity-40 px-6 py-3 border-t border-orange-300 border-opacity-30">
-        <div className="flex items-center justify-between">
-          {/* Performance Message */}
-          <div className="flex items-center space-x-2">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                performanceMessage.mood === "celebrating"
-                  ? "bg-green-400"
-                  : performanceMessage.mood === "steady"
-                  ? "bg-yellow-400"
-                  : "bg-orange-400"
-              } animate-pulse`}
-            ></div>
-            <span className="text-orange-100 text-sm font-medium">
-              {performanceMessage.text}
-            </span>
+      {/* Enhanced Performance Stats Bar with Emotional Design */}
+      <div className={`${performanceMessage.bgColor} px-6 py-4 border-t border-white border-opacity-20 relative overflow-hidden`}>
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent transform -skew-x-12"></div>
+        </div>
+        
+        <div className="flex items-center justify-between relative z-10">
+          {/* Enhanced Performance Message */}
+          <div className="flex items-center space-x-3">
+            <div className={`w-3 h-3 rounded-full bg-white animate-pulse shadow-lg`}></div>
+            <div className="flex flex-col">
+              <span className={`${performanceMessage.textColor} text-base font-semibold leading-tight`}>
+                {performanceMessage.text}
+              </span>
+              <span className={`${performanceMessage.textColor} opacity-90 text-xs mt-0.5`}>
+                Keep up the amazing hospitality! 🏆
+              </span>
+            </div>
           </div>
 
-          {/* Today's Key Metrics */}
-          <div className="flex items-center space-x-6">
-            {/* Orders Completed */}
-            <div className="flex items-center space-x-2 text-orange-100">
-              <TrendingUp size={16} className="text-green-400" />
-              <span className="text-sm">
-                <span className="font-bold text-white">
+          {/* Today's Emotional Metrics */}
+          <div className="flex items-center space-x-8">
+            {/* Happy Customers */}
+            <div className="flex items-center space-x-2 text-white">
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <TrendingUp size={14} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg leading-none">
                   {todayStats.ordersCompleted}
-                </span>{" "}
-                orders today
-              </span>
+                </span>
+                <span className="text-xs opacity-90">
+                  happy customers
+                </span>
+              </div>
             </div>
 
-            {/* Active Drivers */}
-            <div className="flex items-center space-x-2 text-orange-100">
-              <Users size={16} className="text-orange-200" />
-              <span className="text-sm">
-                <span className="font-bold text-white">
+            {/* Delivery Family */}
+            <div className="flex items-center space-x-2 text-white">
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <Users size={14} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg leading-none">
                   {todayStats.activeDrivers}
-                </span>{" "}
-                drivers active
-              </span>
+                </span>
+                <span className="text-xs opacity-90">
+                  delivery heroes
+                </span>
+              </div>
             </div>
 
-            {/* Average Delivery Time */}
-            <div className="flex items-center space-x-2 text-orange-100">
-              <Clock size={16} className="text-yellow-300" />
-              <span className="text-sm">
-                <span className="font-bold text-white">
+            {/* Kitchen Efficiency */}
+            <div className="flex items-center space-x-2 text-white">
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <Clock size={14} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg leading-none">
                   {todayStats.avgDeliveryTime}min
-                </span>{" "}
-                avg delivery
-              </span>
+                </span>
+                <span className="text-xs opacity-90">
+                  kitchen magic
+                </span>
+              </div>
             </div>
 
-            {/* On-Time Rate */}
-            <div className="flex items-center space-x-2 text-orange-100">
-              <MapPin size={16} className="text-green-300" />
-              <span className="text-sm">
-                <span className="font-bold text-white">
+            {/* Excellence Rate */}
+            <div className="flex items-center space-x-2 text-white">
+              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <MapPin size={14} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg leading-none">
                   {todayStats.onTimeRate}%
-                </span>{" "}
-                on-time
-              </span>
+                </span>
+                <span className="text-xs opacity-90">
+                  excellence rate
+                </span>
+              </div>
             </div>
           </div>
         </div>

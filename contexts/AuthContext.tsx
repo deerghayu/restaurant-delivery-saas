@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { Restaurant } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +11,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, restaurantName: string) => Promise<{ data: any; error: any }>;
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
-  restaurant: any | null;
+  restaurant: Restaurant | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [restaurant, setRestaurant] = useState<any | null>(null);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -84,30 +85,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchRestaurant = async (userId: string) => {
     try {
-      
-      // First check if user is linked to a restaurant via restaurant_users
-      const { data: restaurantUser, error: userError } = await supabase
-        .from('restaurant_users')
-        .select('restaurant_id, restaurants(*)')
-        .eq('user_id', userId)
+      // First: Check if user owns a restaurant directly via owner_id
+      const { data: ownedRestaurant, error: ownerError } = await supabase
+        .from('restaurants')
+        .select('*')
+        .eq('owner_id', userId)
         .single();
 
-      if (userError) {
-        if (userError.code === 'PGRST116') {
-          // No restaurant found - this is OK for new users
-          setRestaurant(null);
-        } else {
-          console.error('Error fetching restaurant user:', userError);
-          setRestaurant(null);
-        }
+      if (ownedRestaurant && !ownerError) {
+        setRestaurant(ownedRestaurant);
         return;
       }
 
-      if (restaurantUser && restaurantUser.restaurants) {
-        setRestaurant(restaurantUser.restaurants);
-      } else {
-        setRestaurant(null);
+      // Fallback: check if user has staff access via restaurant_users
+      // First get the restaurant_id
+      const { data: restaurantUser, error: userError } = await supabase
+        .from('restaurant_users')
+        .select('restaurant_id, role')
+        .eq('user_id', userId)
+        .single();
+
+      if (restaurantUser && !userError) {
+        // Then fetch the restaurant details separately
+        const { data: restaurant, error: restaurantError } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('id', restaurantUser.restaurant_id)
+          .single();
+
+        if (restaurant && !restaurantError) {
+          setRestaurant(restaurant);
+          return;
+        }
       }
+
+      setRestaurant(null);
     } catch (error) {
       console.error('Error in fetchRestaurant:', error);
       setRestaurant(null);
@@ -130,13 +142,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Ensure user is authenticated before proceeding
         await supabase.auth.setSession(authData.session);
         
-        // Create restaurant record
+        // Create restaurant record with direct owner relationship
         const { data: restaurantData, error: restaurantError } = await supabase
           .from('restaurants')
           .insert([
             {
               name: restaurantName,
               email: email,
+              owner_id: authData.user.id,
+              // Required fields with sensible defaults
+              phone: '', // To be filled in restaurant settings
+              street_address: '', // To be filled in restaurant settings
+              suburb: '', // To be filled in restaurant settings
+              state: 'NSW', // Default Australian state
+              postcode: '2000', // Default Sydney postcode
             }
           ])
           .select()
