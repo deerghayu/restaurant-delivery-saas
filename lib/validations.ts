@@ -30,10 +30,7 @@ export const restaurantProfileSchema = z.object({
   suburb: z.string()
     .min(2, 'Suburb must be at least 2 characters')
     .max(50, 'Suburb too long'),
-  state: z.enum(['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'], {
-    invalid_type_error: 'Invalid Australian state',
-    required_error: 'State is required'
-  }),
+  state: z.enum(['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']),
   postcode: z.string()
     .length(4, 'Australian postcode must be 4 digits')
     .regex(/^\d{4}$/, 'Postcode must contain only digits'),
