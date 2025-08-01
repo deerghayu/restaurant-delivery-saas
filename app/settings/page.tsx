@@ -5,46 +5,22 @@ import { supabase } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import {
   ArrowLeft,
-  Save,
   AlertCircle,
   CheckCircle,
-  Store,
-  Palette,
-  Settings as SettingsIcon,
-  DollarSign,
-  Crown,
-  Upload,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
-  Calendar,
-  Truck,
-  Target,
-  Globe,
-  CreditCard,
-  Users,
-  Shield,
-  Star,
-  Award,
-  Heart,
-  Zap,
-  TrendingUp,
   Sparkles
 } from 'lucide-react';
 import DelightfulLoading from '@/components/DelightfulLoading';
 import Link from 'next/link';
-
-const australianStates = [
-  { value: 'NSW', label: 'New South Wales' },
-  { value: 'VIC', label: 'Victoria' },
-  { value: 'QLD', label: 'Queensland' },
-  { value: 'WA', label: 'Western Australia' },
-  { value: 'SA', label: 'South Australia' },
-  { value: 'TAS', label: 'Tasmania' },
-  { value: 'ACT', label: 'Australian Capital Territory' },
-  { value: 'NT', label: 'Northern Territory' }
-];
+import {
+  SettingsTabNavigation,
+  ProfileTab,
+  BrandingTab,
+  OperationsTab,
+  DeliveryTab,
+  SubscriptionTab,
+  ProfileCompletionCard,
+  SaveButton
+} from '@/components/settings';
 
 const businessHoursTemplate = {
   monday: { open: '09:00', close: '22:00', closed: false },
@@ -55,39 +31,6 @@ const businessHoursTemplate = {
   saturday: { open: '09:00', close: '22:00', closed: false },
   sunday: { open: '09:00', close: '22:00', closed: false }
 };
-
-const settingsTabs = [
-  {
-    id: 'profile',
-    name: 'Restaurant Profile',
-    icon: Store,
-    description: 'Basic information and contact details'
-  },
-  {
-    id: 'branding',
-    name: 'Branding & Theme',
-    icon: Palette,
-    description: 'Logo, colors, and visual identity'
-  },
-  {
-    id: 'operations',
-    name: 'Operations',
-    icon: SettingsIcon,
-    description: 'Business hours and operational settings'
-  },
-  {
-    id: 'delivery',
-    name: 'Pricing & Delivery',
-    icon: DollarSign,
-    description: 'Delivery fees, minimum orders, and service area'
-  },
-  {
-    id: 'subscription',
-    name: 'Subscription',
-    icon: Crown,
-    description: 'Plan details and billing information'
-  }
-];
 
 export default function SettingsPage() {
   const { restaurant, user } = useAuth();
@@ -245,600 +188,26 @@ export default function SettingsPage() {
           delivery_fee: formData.delivery_fee,
           updated_at: new Date().toISOString()
         })
-        .eq('id', restaurant.id)
-        .select()
-        .single();
+        .eq('id', restaurant.id);
 
       if (error) throw error;
 
-      setMessage({ type: 'success', text: 'Settings updated successfully!' });
+      setMessage({ type: 'success', text: 'Settings saved successfully! 🎉' });
       setHasChanges(false);
       
-      // Refresh the restaurant data in context
-      window.location.reload();
+      // Trigger completion celebration if profile is now complete
+      const newCompleteness = calculateCompleteness(formData);
+      if (newCompleteness >= 90 && newCompleteness > profileCompleteness) {
+        setCelebrateCompletion(true);
+        setTimeout(() => setCelebrateCompletion(false), 4000);
+      }
+      setProfileCompleteness(newCompleteness);
+      
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to update settings' });
+      setMessage({ type: 'error', text: error.message || 'Failed to save settings' });
     } finally {
       setLoading(false);
     }
-  };
-
-  const renderProfileTab = () => (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <Store className="w-5 h-5 text-blue-600 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-blue-900">Restaurant Profile</h3>
-            <p className="text-sm text-blue-700 mt-1">
-              This information appears on your restaurant profile and order confirmations.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Restaurant Name *
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => updateFormData('name', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            placeholder="Mario's Italian Kitchen"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Contact Phone *
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-2.5 h-4 w-4 text-green-500" />
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => updateFormData('phone', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="(02) 9876 5432"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address *
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-blue-500" />
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => updateFormData('email', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="owner@restaurant.com"
-              required
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-          <MapPin className="w-5 h-5 text-red-500" />
-          <span>Restaurant Address</span>
-        </h3>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Street Address *
-            </label>
-            <input
-              type="text"
-              value={formData.street_address}
-              onChange={(e) => updateFormData('street_address', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="123 Collins Street"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Suburb *
-              </label>
-              <input
-                type="text"
-                value={formData.suburb}
-                onChange={(e) => updateFormData('suburb', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Melbourne"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                State *
-              </label>
-              <select
-                value={formData.state}
-                onChange={(e) => updateFormData('state', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                required
-              >
-                {australianStates.map(state => (
-                  <option key={state.value} value={state.value}>
-                    {state.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Postcode *
-              </label>
-              <input
-                type="text"
-                value={formData.postcode}
-                onChange={(e) => updateFormData('postcode', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="3000"
-                maxLength={4}
-                required
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderBrandingTab = () => (
-    <div className="space-y-8">
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-        <div className="flex items-start space-x-3">
-          <Palette className="w-5 h-5 text-purple-500 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-purple-900">Branding & Theme</h3>
-            <p className="text-sm text-purple-700 mt-1">
-              Customize your restaurant's visual identity and brand colors.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Restaurant Logo
-            </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              {formData.logo_url ? (
-                <div className="space-y-4">
-                  <img 
-                    src={formData.logo_url} 
-                    alt="Restaurant logo"
-                    className="w-24 h-24 object-cover rounded-full mx-auto"
-                  />
-                  <button
-                    type="button"
-                    className="text-sm text-gray-600 hover:text-gray-800 underline"
-                    onClick={() => updateFormData('logo_url', '')}
-                  >
-                    Remove logo
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-                  <div>
-                    <p className="text-sm text-gray-600">
-                      Logo upload coming soon
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      For now, add a direct image URL below
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="mt-4">
-              <input
-                type="url"
-                value={formData.logo_url}
-                onChange={(e) => updateFormData('logo_url', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                placeholder="https://example.com/logo.png"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Primary Brand Color
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="color"
-                value={formData.primary_color}
-                onChange={(e) => updateFormData('primary_color', e.target.value)}
-                className="w-16 h-12 border border-gray-300 rounded-lg cursor-pointer"
-              />
-              <div>
-                <input
-                  type="text"
-                  value={formData.primary_color}
-                  onChange={(e) => updateFormData('primary_color', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  This color appears in your dashboard header and customer-facing pages
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-medium text-gray-900">Preview</h3>
-          <div 
-            className="border rounded-lg p-4 text-white"
-            style={{ backgroundColor: formData.primary_color }}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                {formData.logo_url ? (
-                  <img 
-                    src={formData.logo_url} 
-                    alt="Logo preview"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xl">🍕</span>
-                )}
-              </div>
-              <div>
-                <h4 className="font-bold">{formData.name || 'Your Restaurant'}</h4>
-                <p className="text-sm opacity-90">{formData.suburb}, {formData.state}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderOperationsTab = () => (
-    <div className="space-y-6">
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <Clock className="w-5 h-5 text-green-600 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-green-900">Operations & Hours</h3>
-            <p className="text-sm text-green-700 mt-1">
-              Configure your business hours and operational settings.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Average Prep Time (minutes) *
-            </label>
-            <div className="relative">
-              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-orange-500" />
-              <input
-                type="number"
-                min="5"
-                max="120"
-                value={formData.average_prep_time}
-                onChange={(e) => updateFormData('average_prep_time', parseInt(e.target.value) || 15)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                required
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Used to calculate estimated ready times for orders
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <span>Business Hours</span>
-          </h3>
-          
-          <div className="space-y-3">
-            {Object.entries(formData.business_hours).map(([day, hours]: [string, any]) => (
-              <div key={day} className="flex items-center space-x-4 py-2">
-                <div className="w-20">
-                  <span className="text-sm font-medium text-gray-700 capitalize">{day}</span>
-                </div>
-                
-                <div className="flex items-center space-x-3 flex-1">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={!hours.closed}
-                      onChange={(e) => updateBusinessHours(day, 'closed', !e.target.checked)}
-                      className="w-4 h-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                    />
-                    <span className="text-sm">Open</span>
-                  </label>
-                  
-                  {!hours.closed ? (
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="time"
-                        value={hours.open}
-                        onChange={(e) => updateBusinessHours(day, 'open', e.target.value)}
-                        className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                      />
-                      <span className="text-gray-500 text-sm">to</span>
-                      <input
-                        type="time"
-                        value={hours.close}
-                        onChange={(e) => updateBusinessHours(day, 'close', e.target.value)}
-                        className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-gray-500 text-sm">Closed</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderDeliveryTab = () => (
-    <div className="space-y-10">
-      <div className="bg-orange-50 border border-orange-200 rounded-lg p-8">
-        <div className="flex items-start space-x-4">
-          <Truck className="w-6 h-6 text-orange-500 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-orange-900 text-lg">Pricing & Delivery</h3>
-            <p className="text-sm text-orange-700 mt-2">
-              Configure your delivery fees, minimum orders, and service area.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div>
-          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-            <DollarSign className="w-4 h-4" />
-            <span>Minimum Order (AUD) *</span>
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.50"
-            value={formData.minimum_order}
-            onChange={(e) => updateFormData('minimum_order', parseFloat(e.target.value) || 25)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Minimum order amount before delivery
-          </p>
-        </div>
-
-        <div>
-          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-            <Truck className="w-4 h-4" />
-            <span>Delivery Fee (AUD) *</span>
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.50"
-            value={formData.delivery_fee}
-            onChange={(e) => updateFormData('delivery_fee', parseFloat(e.target.value) || 5)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Flat delivery fee for all orders
-          </p>
-        </div>
-
-        <div>
-          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-            <Target className="w-4 h-4" />
-            <span>Delivery Radius (km) *</span>
-          </label>
-          <input
-            type="number"
-            min="1"
-            max="50"
-            value={formData.delivery_radius}
-            onChange={(e) => updateFormData('delivery_radius', parseInt(e.target.value) || 10)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Maximum delivery distance from your location
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 rounded-lg p-6 mt-8">
-        <h4 className="font-medium text-gray-900 mb-3 text-lg">Delivery Area Preview</h4>
-        <p className="text-sm text-gray-600 mb-4">
-          You'll deliver within {formData.delivery_radius}km of {formData.street_address}, {formData.suburb}, {formData.state} {formData.postcode}
-        </p>
-        <div className="mt-4 text-sm">
-          <strong>Pricing Summary:</strong>
-          <ul className="list-disc list-inside space-y-1 text-gray-600 mt-1">
-            <li>Minimum order: ${formData.minimum_order.toFixed(2)}</li>
-            <li>Delivery fee: ${formData.delivery_fee.toFixed(2)}</li>
-            <li>Example total: ${(formData.minimum_order + formData.delivery_fee).toFixed(2)}</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSubscriptionTab = () => {
-    const trialDaysLeft = formData.trial_ends_at ? 
-      Math.max(0, Math.ceil((new Date(formData.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
-
-    return (
-      <div className="space-y-5">
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-          <div className="flex items-start space-x-3">
-            <Crown className="w-5 h-5 text-indigo-600 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-indigo-900">Subscription & Billing</h3>
-              <p className="text-sm text-indigo-700 mt-1">
-                Manage your subscription plan and billing information.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium text-gray-900">Current Plan</h4>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  formData.subscription_plan === 'trial' 
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : formData.subscription_plan === 'pro'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {formData.subscription_plan.charAt(0).toUpperCase() + formData.subscription_plan.slice(1)}
-                </span>
-              </div>
-
-              {formData.subscription_plan === 'trial' && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-yellow-600" />
-                    <div>
-                      <p className="font-medium text-yellow-800 text-sm">
-                        {trialDaysLeft > 0 ? `${trialDaysLeft} days left in trial` : 'Trial expired'}
-                      </p>
-                      <p className="text-xs text-yellow-700">
-                        Upgrade to continue using all features
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Status:</span>
-                  <span className={`font-medium ${
-                    formData.subscription_status === 'active' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {formData.subscription_status.charAt(0).toUpperCase() + formData.subscription_status.slice(1)}
-                  </span>
-                </div>
-                
-                {formData.trial_ends_at && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">
-                      {formData.subscription_plan === 'trial' ? 'Trial ends:' : 'Next billing:'}
-                    </span>
-                    <span className="font-medium">
-                      {new Date(formData.trial_ends_at).toLocaleDateString('en-AU')}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-3">Account Status</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-gray-600">Account Active</span>
-                  </div>
-                  <div className={`w-3 h-3 rounded-full ${
-                    formData.is_active ? 'bg-green-400' : 'bg-red-400'
-                  }`}></div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm text-gray-600">Restaurant Owner</span>
-                  </div>
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-3">Available Plans</h4>
-              
-              <div className="space-y-3">
-                <div className="border border-gray-300 bg-gray-50 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium text-sm">Starter Plan</h5>
-                    <span className="font-bold text-sm">$29/month</span>
-                  </div>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Up to 100 orders/month</li>
-                    <li>• Basic reporting</li>
-                    <li>• Email support</li>
-                  </ul>
-                </div>
-
-                <div className="border-2 border-orange-500 rounded-lg p-3 relative">
-                  <div className="absolute -top-2 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded">
-                    Recommended
-                  </div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium text-sm">Pro Plan</h5>
-                    <span className="font-bold text-sm">$79/month</span>
-                  </div>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Unlimited orders</li>
-                    <li>• Advanced analytics</li>
-                    <li>• Driver management</li>
-                    <li>• Priority support</li>
-                    <li>• Custom branding</li>
-                  </ul>
-                </div>
-              </div>
-
-              <button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                Upgrade Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   if (!restaurant) {
@@ -872,109 +241,96 @@ export default function SettingsPage() {
                 </Link>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
-                    <SettingsIcon className="w-7 h-7 text-orange-500" />
                     <span>Restaurant Settings</span>
                   </h1>
                   <p className="text-gray-600 mt-1">Configure your restaurant profile and preferences</p>
                 </div>
               </div>
               
-              {/* Profile Completeness */}
-              <div className="text-right">
-                <div className="bg-white rounded-lg p-4 shadow border border-gray-200">
-                  <div className="text-sm text-gray-600 mb-1">Profile Complete</div>
-                  <div className="text-xl font-bold text-gray-900 mb-2">{profileCompleteness}%</div>
-                  <div className="w-24 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="h-full rounded-full bg-green-500 transition-all"
-                      style={{ width: `${profileCompleteness}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+              <ProfileCompletionCard profileCompleteness={profileCompleteness} />
             </div>
           </div>
-          
-          {/* Save Button */}
-          {hasChanges && (
-            <div className="fixed bottom-8 right-8 z-[9999]">
-              <button
-                onClick={handleSave}
-                disabled={loading}
-                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg transition-colors flex items-center space-x-2 disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    <span>Save Changes</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
 
           {/* Message */}
           {message && (
-            <div className={`mb-6 ${
-              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white rounded-lg p-4`}>
-              <div className="flex items-center space-x-3">
-                {message.type === 'success' ? 
-                  <CheckCircle size={20} className="text-white" /> : 
-                  <AlertCircle size={20} className="text-white" />
-                }
-                <p className="font-medium">{message.text}</p>
+            <div className={`mb-6 p-4 rounded-lg flex items-center space-x-2 ${
+              message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+            }`}>
+              {message.type === 'success' ? 
+                <CheckCircle className="w-5 h-5 text-green-500" /> : 
+                <AlertCircle className="w-5 h-5 text-red-500" />
+              }
+              <p className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
+                {message.text}
+              </p>
+            </div>
+          )}
+
+          {/* Celebration Animation */}
+          {celebrateCompletion && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+              <div className="bg-white rounded-lg shadow-2xl p-8 text-center animate-bounce">
+                <Sparkles className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Profile Complete! 🎉</h2>
+                <p className="text-gray-600">Your restaurant is ready to start taking orders!</p>
               </div>
             </div>
           )}
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Settings Navigation */}
-            <div className="lg:w-64 flex-shrink-0">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="font-semibold text-gray-900">Settings</h2>
-                </div>
-                <nav className="space-y-1 p-2">
-                  {settingsTabs.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`w-full text-left px-4 py-3 flex items-center space-x-3 hover:bg-gray-50 transition-colors ${
-                          activeTab === tab.id ? 'bg-orange-50 border-r-2 border-orange-500 text-orange-700' : 'text-gray-700'
-                        }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        <div>
-                          <div className="font-medium">{tab.name}</div>
-                          <div className="text-xs text-gray-500">{tab.description}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </nav>
-              </div>
+            <div className="lg:col-span-1">
+              <SettingsTabNavigation 
+                activeTab={activeTab} 
+                onTabChange={setActiveTab} 
+              />
             </div>
 
             {/* Settings Content */}
-            <div className="flex-1">
+            <div className="lg:col-span-3">
               <div className="bg-white rounded-lg shadow-sm p-8">
-                {activeTab === 'profile' && renderProfileTab()}
-                {activeTab === 'branding' && renderBrandingTab()}
-                {activeTab === 'operations' && renderOperationsTab()}
-                {activeTab === 'delivery' && renderDeliveryTab()}
-                {activeTab === 'subscription' && renderSubscriptionTab()}
+                {activeTab === 'profile' && (
+                  <ProfileTab 
+                    formData={formData} 
+                    updateFormData={updateFormData} 
+                  />
+                )}
+                {activeTab === 'branding' && (
+                  <BrandingTab 
+                    formData={formData} 
+                    updateFormData={updateFormData} 
+                  />
+                )}
+                {activeTab === 'operations' && (
+                  <OperationsTab 
+                    formData={formData} 
+                    updateFormData={updateFormData} 
+                    updateBusinessHours={updateBusinessHours}
+                  />
+                )}
+                {activeTab === 'delivery' && (
+                  <DeliveryTab 
+                    formData={formData} 
+                    updateFormData={updateFormData} 
+                  />
+                )}
+                {activeTab === 'subscription' && (
+                  <SubscriptionTab 
+                    formData={formData} 
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Save Button */}
+        <SaveButton 
+          hasChanges={hasChanges} 
+          loading={loading} 
+          onSave={handleSave} 
+        />
       </div>
     </ProtectedRoute>
   );
