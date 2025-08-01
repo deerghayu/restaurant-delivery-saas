@@ -48,7 +48,7 @@ export default function SettingsTabNavigation({ activeTab, onTabChange }: Settin
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 mb-6">
       <div className="px-6 py-4 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900">Settings</h2>
+        <h2 className="text-lg font-semibold text-gray-900"></h2>
         <p className="text-sm text-gray-600 mt-1">Manage your restaurant configuration</p>
       </div>
       <div className="p-2">

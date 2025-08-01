@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from 'react';
-import { X, Plus, Minus, DollarSign, User, MapPin, Phone, FileText } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Plus, Minus, DollarSign, User, MapPin, Phone, FileText, ShoppingCart, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -14,6 +14,13 @@ interface OrderItem {
   name: string;
   quantity: number;
   price: number;
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
 }
 
 export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOrderModalProps) {
@@ -30,27 +37,59 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     { name: '', quantity: 1, price: 0 }
   ]);
 
-  // Common menu items for quick selection
-  const popularItems = [
-    { name: 'Margherita Pizza', price: 18.90 },
-    { name: 'Pepperoni Pizza', price: 21.90 },
-    { name: 'Supreme Pizza', price: 24.90 },
-    { name: 'Hawaiian Pizza', price: 22.90 },
-    { name: 'Meat Lovers Pizza', price: 26.90 },
-    { name: 'Garlic Bread', price: 8.50 },
-    { name: 'Caesar Salad', price: 12.90 },
-    { name: 'Chicken Wings', price: 14.90 },
-    { name: 'Soft Drink', price: 3.50 },
+  // Restaurant menu items (in real app, this would come from database)
+  const menuItems: MenuItem[] = [
+    // Pizzas
+    { id: '1', name: 'Margherita Pizza', price: 18.90, category: 'Pizza' },
+    { id: '2', name: 'Pepperoni Pizza', price: 21.90, category: 'Pizza' },
+    { id: '3', name: 'Supreme Pizza', price: 24.90, category: 'Pizza' },
+    { id: '4', name: 'Hawaiian Pizza', price: 22.90, category: 'Pizza' },
+    { id: '5', name: 'Meat Lovers Pizza', price: 26.90, category: 'Pizza' },
+    { id: '6', name: 'Vegetarian Pizza', price: 20.90, category: 'Pizza' },
+    { id: '7', name: 'BBQ Chicken Pizza', price: 23.90, category: 'Pizza' },
+    // Sides
+    { id: '8', name: 'Garlic Bread', price: 8.50, category: 'Sides' },
+    { id: '9', name: 'Cheesy Garlic Bread', price: 10.50, category: 'Sides' },
+    { id: '10', name: 'Potato Wedges', price: 9.90, category: 'Sides' },
+    { id: '11', name: 'Chicken Wings (6pc)', price: 14.90, category: 'Sides' },
+    { id: '12', name: 'Chicken Wings (12pc)', price: 24.90, category: 'Sides' },
+    // Salads
+    { id: '13', name: 'Caesar Salad', price: 12.90, category: 'Salads' },
+    { id: '14', name: 'Garden Salad', price: 10.90, category: 'Salads' },
+    { id: '15', name: 'Greek Salad', price: 13.90, category: 'Salads' },
+    // Beverages
+    { id: '16', name: 'Coca Cola 375ml', price: 3.50, category: 'Beverages' },
+    { id: '17', name: 'Sprite 375ml', price: 3.50, category: 'Beverages' },
+    { id: '18', name: 'Orange Juice 375ml', price: 4.50, category: 'Beverages' },
+    { id: '19', name: 'Water 600ml', price: 2.50, category: 'Beverages' },
+    // Desserts
+    { id: '20', name: 'Chocolate Brownie', price: 7.90, category: 'Desserts' },
+    { id: '21', name: 'Tiramisu', price: 8.90, category: 'Desserts' },
+    { id: '22', name: 'Gelato (2 scoops)', price: 6.90, category: 'Desserts' }
   ];
 
+  const [searchTerms, setSearchTerms] = useState<string[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const addItem = () => {
-    setItems([...items, { name: '', quantity: 1, price: 0 }]);
-  };
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+
 
   const removeItem = (index: number) => {
     if (items.length > 1) {
       setItems(items.filter((_, i) => i !== index));
+      setSearchTerms(searchTerms.filter((_, i) => i !== index));
     }
   };
 
@@ -61,9 +100,34 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     setItems(updatedItems);
   };
 
-  const quickSelectItem = (item: { name: string; price: number }, index: number) => {
-    updateItem(index, 'name', item.name);
-    updateItem(index, 'price', item.price);
+  const selectMenuItem = (menuItem: MenuItem, index: number) => {
+    updateItem(index, 'name', menuItem.name);
+    updateItem(index, 'price', menuItem.price);
+    setDropdownOpen(null);
+    // Clear search term for this item
+    const newSearchTerms = [...searchTerms];
+    newSearchTerms[index] = '';
+    setSearchTerms(newSearchTerms);
+  };
+
+  const filterMenuItems = (searchTerm: string) => {
+    if (!searchTerm) return menuItems;
+    return menuItems.filter(item => 
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const updateSearchTerm = (index: number, term: string) => {
+    const newSearchTerms = [...searchTerms];
+    newSearchTerms[index] = term;
+    setSearchTerms(newSearchTerms);
+    setDropdownOpen(index);
+  };
+
+  const addItem = () => {
+    setItems([...items, { name: '', quantity: 1, price: 0 }]);
+    setSearchTerms([...searchTerms, '']);
   };
 
   const calculateTotal = () => {
@@ -76,6 +140,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     setCustomerAddress('');
     setSpecialInstructions('');
     setItems([{ name: '', quantity: 1, price: 0 }]);
+    setSearchTerms(['']);
+    setDropdownOpen(null);
     setError(null);
   };
 
@@ -202,12 +268,12 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="bg-orange-500 text-white px-6 py-4 rounded-t-xl flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <Plus className="w-6 h-6 text-white" />
+              <ShoppingCart className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">New Order</h2>
@@ -224,178 +290,233 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-5">
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-red-700 text-sm">{error}</p>
-              </div>
-            )}
-
-            {/* Customer Information - Compact */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Customer Name *
-              </label>
-              <input
-                type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                placeholder="John Smith"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                placeholder="0412 345 678"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Address *
-              </label>
-              <input
-                type="text"
-                value={customerAddress}
-                onChange={(e) => setCustomerAddress(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                placeholder="123 Main St, Melbourne VIC 3000"
-                required
-              />
-            </div>
-
-            {/* Order Items */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Order Items *
-              </label>
+          {/* Content with horizontal layout */}
+          <div className="flex-1 p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+              {/* Left Column - Customer Information */}
               <div className="space-y-4">
-                {items.map((item, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-medium text-gray-700">Item {index + 1}</span>
-                      {items.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeItem(index)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                        >
-                          <Minus size={16} />
-                        </button>
-                      )}
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Item Name *
-                        </label>
-                        <input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => updateItem(index, 'name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
-                          placeholder="Pizza, Salad, etc."
-                          required
-                        />
-                        {/* Quick select for first item only */}
-                        {index === 0 && item.name === '' && (
-                          <div className="mt-2">
-                            <p className="text-xs text-gray-500 mb-2">Quick select:</p>
-                            <div className="flex flex-wrap gap-2">
-                              {popularItems.slice(0, 4).map((popularItem) => (
-                                <button
-                                  key={popularItem.name}
-                                  type="button"
-                                  onClick={() => quickSelectItem(popularItem, index)}
-                                  className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
-                                >
-                                  {popularItem.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 col-span-full">
+                    <p className="text-red-700 text-sm">{error}</p>
+                  </div>
+                )}
+
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h3>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Customer Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                    placeholder="John Smith"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                    placeholder="0412 345 678"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Delivery Address *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerAddress}
+                    onChange={(e) => setCustomerAddress(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                    placeholder="123 Main St, Melbourne VIC 3000"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Special Instructions
+                  </label>
+                  <textarea
+                    value={specialInstructions}
+                    onChange={(e) => setSpecialInstructions(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                    placeholder="Extra cheese, no onions, call when arriving..."
+                    rows={3}
+                  />
+                </div>
+
+                {/* Order Total */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-semibold text-gray-900">Order Total:</span>
+                    <span className="text-2xl font-bold text-green-600 flex items-center">
+                      <DollarSign size={20} />
+                      {calculateTotal().toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Order Items */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                
+                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2">
+                  {items.map((item, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      {/* Header with remove button */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-medium text-gray-600">#{index + 1}</span>
+                        {items.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeItem(index)}
+                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                            title="Remove item"
+                          >
+                            <X size={14} />
+                          </button>
                         )}
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2">
+                      {/* Menu Item Selector */}
+                      <div className="mb-3 relative" ref={dropdownRef}>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Menu Item *
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={item.name || searchTerms[index] || ''}
+                            onChange={(e) => {
+                              if (!item.name) {
+                                updateSearchTerm(index, e.target.value);
+                              }
+                            }}
+                            onFocus={() => !item.name && setDropdownOpen(index)}
+                            className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
+                            placeholder={item.name ? item.name : "Search menu items..."}
+                            readOnly={!!item.name}
+                            required
+                          />
+                          <div className="absolute right-2 top-2.5 flex items-center space-x-1">
+                            {item.name && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateItem(index, 'name', '');
+                                  updateItem(index, 'price', 0);
+                                  updateSearchTerm(index, '');
+                                }}
+                                className="text-gray-400 hover:text-gray-600 p-0.5"
+                                title="Clear selection"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
+                            {!item.name && (
+                              <Search size={16} className="text-gray-400" />
+                            )}
+                          </div>
+                          
+                          {/* Dropdown */}
+                          {dropdownOpen === index && !item.name && (
+                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                              {filterMenuItems(searchTerms[index] || '').length === 0 ? (
+                                <div className="px-3 py-2 text-gray-500 text-sm">No items found</div>
+                              ) : (
+                                filterMenuItems(searchTerms[index] || '').map((menuItem) => (
+                                  <button
+                                    key={menuItem.id}
+                                    type="button"
+                                    onClick={() => selectMenuItem(menuItem, index)}
+                                    className="w-full text-left px-3 py-2 hover:bg-orange-50 border-b border-gray-100 last:border-b-0 focus:bg-orange-50 focus:outline-none"
+                                  >
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <div className="font-medium text-gray-900">{menuItem.name}</div>
+                                        <div className="text-xs text-gray-500">{menuItem.category}</div>
+                                      </div>
+                                      <div className="text-sm font-semibold text-green-600">${menuItem.price.toFixed(2)}</div>
+                                    </div>
+                                  </button>
+                                ))
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Quantity and Price in compact row */}
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Qty *
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            Qty
                           </label>
                           <input
                             type="number"
                             min="1"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
+                            className="w-full px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white text-sm"
                             required
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Price *
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            Price
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.price}
-                            onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
-                            placeholder="0.00"
-                            required
-                          />
+                          <div className="relative">
+                            <span className="absolute left-2 top-1.5 text-gray-500 text-sm">$</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.price}
+                              onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
+                              className="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white text-sm"
+                              placeholder="0.00"
+                              readOnly={!!item.name}
+                              required
+                            />
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Item total */}
+                      {item.price > 0 && (
+                        <div className="mt-2 text-right">
+                          <span className="text-sm font-medium text-gray-700">
+                            Subtotal: <span className="text-green-600">${(item.quantity * item.price).toFixed(2)}</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-                
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-600 hover:border-orange-400 hover:text-orange-600 transition-colors flex items-center justify-center space-x-2"
-                >
-                  <Plus size={16} />
-                  <span>Add Another Item</span>
-                </button>
+                  ))}
+                  
+                  <button
+                    type="button"
+                    onClick={addItem}
+                    className="w-full border-2 border-dashed border-orange-200 rounded-lg py-2 text-orange-600 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
+                  >
+                    <Plus size={16} />
+                    <span>Add Item</span>
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* Order Total */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-gray-900">Order Total:</span>
-                <span className="text-2xl font-bold text-green-600 flex items-center">
-                  <DollarSign size={20} />
-                  {calculateTotal().toFixed(2)}
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Special Instructions
-              </label>
-              <textarea
-                value={specialInstructions}
-                onChange={(e) => setSpecialInstructions(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                placeholder="Extra cheese, no onions, call when arriving..."
-                rows={2}
-              />
             </div>
           </div>
             
