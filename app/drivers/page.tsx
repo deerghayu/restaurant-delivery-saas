@@ -33,6 +33,8 @@ export default function DriversPage() {
   const [showNewDriverForm, setShowNewDriverForm] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [driverToDelete, setDriverToDelete] = useState<Driver | null>(null);
 
   // New driver form state
   const [formData, setFormData] = useState({
@@ -203,14 +205,19 @@ export default function DriversPage() {
     setShowNewDriverForm(true);
   };
 
-  const handleDelete = async (driverId: string) => {
-    if (!confirm('Are you sure you want to remove this driver?')) return;
+  const handleDeleteClick = (driver: Driver) => {
+    setDriverToDelete(driver);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!driverToDelete) return;
 
     try {
       const { error } = await supabase
         .from('drivers')
         .delete()
-        .eq('id', driverId);
+        .eq('id', driverToDelete.id);
 
       if (error) throw error;
       
@@ -218,7 +225,15 @@ export default function DriversPage() {
       fetchDrivers();
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
+    } finally {
+      setShowDeleteModal(false);
+      setDriverToDelete(null);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setDriverToDelete(null);
   };
 
   const toggleDriverStatus = async (driver: Driver) => {
@@ -486,7 +501,7 @@ export default function DriversPage() {
                           </button>
                           
                           <button
-                            onClick={() => handleDelete(driver.id)}
+                            onClick={() => handleDeleteClick(driver)}
                             className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
                             title="Remove driver"
                           >
@@ -616,6 +631,73 @@ export default function DriversPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Driver Confirmation Modal */}
+        {showDeleteModal && driverToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+              <div className="bg-red-500 text-white px-6 py-4 rounded-t-xl">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <Trash2 className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Remove Driver</h2>
+                    <p className="text-red-100 text-sm">
+                      This action cannot be undone
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-2xl">
+                    {driverToDelete.avatar_emoji}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{driverToDelete.name}</h3>
+                    <p className="text-gray-600 text-sm">{driverToDelete.phone}</p>
+                    <p className="text-gray-500 text-xs">
+                      {driverToDelete.total_deliveries} deliveries • ⭐ {driverToDelete.average_rating.toFixed(1)} rating
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-red-800 font-medium text-sm">Are you sure you want to remove this driver?</p>
+                      <p className="text-red-700 text-sm mt-1">
+                        This will permanently remove <strong>{driverToDelete.name}</strong> from your delivery team. 
+                        All their delivery history will be preserved, but they won't be able to receive new orders.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={handleDeleteCancel}
+                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteConfirm}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Trash2 size={16} />
+                    <span>Remove Driver</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
