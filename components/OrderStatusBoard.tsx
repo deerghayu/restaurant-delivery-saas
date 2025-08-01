@@ -15,7 +15,8 @@ import {
   Star,
   Zap,
   Coffee,
-  Award
+  Award,
+  Plus
 } from 'lucide-react';
 import DelightfulLoading from './DelightfulLoading';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,9 +24,10 @@ import { supabase } from '@/lib/supabase';
 
 interface OrderStatusBoardProps {
   newOrder?: any | null;
+  onNewOrderClick?: () => void;
 }
 
-const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
+const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) => {
   const { restaurant } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -198,10 +200,10 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
     
     // Set action feedback
     const actionMessages = {
-      'confirmed': '🎉 Order confirmed! Kitchen magic begins!',
-      'ready': '✨ Ready for pickup! Your creation awaits!',
-      'picked_up': '🚀 Off they go! Spreading joy across the city!',
-      'delivered': '🎆 Success! Another happy customer created!'
+      'confirmed': 'Order confirmed and being prepared',
+      'ready': 'Order ready for pickup',
+      'picked_up': 'Order picked up by driver',
+      'delivered': 'Order delivered successfully'
     };
     
     setRecentAction({
@@ -330,61 +332,65 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
 
     return (
       <div 
-        className={`bg-white rounded-xl shadow-sm border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
-          selectedOrder?.id === order.id ? 'border-orange-400 shadow-xl ring-2 ring-orange-200 scale-[1.02]' : 'border-gray-200'
+        className={`bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer ${
+          selectedOrder?.id === order.id ? 'border-orange-400 shadow-lg ring-1 ring-orange-200' : 'border-gray-200'
         } ${isPending ? getPriorityStyle(order.priority) : ''} ${
-          celebratingOrder === order.id ? 'animate-celebration ring-4 ring-green-300 border-green-400' : ''
+          celebratingOrder === order.id ? 'animate-celebration ring-2 ring-green-300 border-green-400' : ''
         }`}
         onClick={() => setSelectedOrder(order)}
       >
-        {/* Order Header */}
-        <div className="p-4 border-b border-gray-200">
+        {/* Compact Header */}
+        <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-gray-800">#{order.id.slice(-4)}</span>
+              <span className="font-bold text-gray-800 text-sm">#{order.id.slice(-4)}</span>
               {order.priority === 'high' && (
-                <AlertCircle size={16} className="text-red-500" />
+                <AlertCircle size={14} className="text-red-500" />
               )}
+              <span className="text-xs text-gray-500">{getTimeAgo(order.orderTime)}</span>
             </div>
-            <div className="text-right">
-              <div className="font-bold text-green-600 flex items-center">
-                <DollarSign size={14} />
-                {order.total.toFixed(2)}
-              </div>
-              <div className="text-xs text-gray-700 font-medium">{getTimeAgo(order.orderTime)}</div>
+            <div className="font-bold text-green-600 flex items-center text-sm">
+              <DollarSign size={12} />
+              {order.total.toFixed(2)}
             </div>
           </div>
         </div>
 
-        {/* Customer Info */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <User size={16} className="text-blue-500" />
-            <span className="font-semibold text-gray-800 text-base">{order.customerName}</span>
+        {/* Compact Customer & Items */}
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <User size={14} className="text-blue-500" />
+              <span className="font-medium text-gray-800 text-sm">{order.customerName}</span>
+            </div>
             <button 
-              className="ml-auto p-1 hover:bg-gray-100 rounded"
+              className="p-1 hover:bg-gray-100 rounded"
               title="Call customer"
             >
-              <Phone size={14} className="text-green-500" />
+              <Phone size={12} className="text-green-500" />
             </button>
           </div>
-          <div className="flex items-start space-x-2">
-            <MapPin size={16} className="text-red-500 mt-0.5" />
-            <span className="text-sm text-gray-800 leading-relaxed font-medium">{order.customerAddress}</span>
+          
+          <div className="flex items-start space-x-2 mb-2">
+            <MapPin size={12} className="text-red-500 mt-0.5 flex-shrink-0" />
+            <span className="text-xs text-gray-600 leading-relaxed">{order.customerAddress}</span>
           </div>
-        </div>
 
-        {/* Order Items */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="space-y-1">
-            {order.items.map((item, index) => (
-              <div key={index} className="text-sm text-gray-800 font-medium">
+          <div className="space-y-1 mb-3">
+            {order.items.slice(0, 2).map((item, index) => (
+              <div key={index} className="text-xs text-gray-700">
                 • {typeof item === 'object' ? `${item.quantity}x ${item.name}` : item}
               </div>
             ))}
+            {order.items.length > 2 && (
+              <div className="text-xs text-gray-500">
+                + {order.items.length - 2} more items
+              </div>
+            )}
           </div>
+          
           {order.specialInstructions && (
-            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-900 font-medium">
+            <div className="p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800 mb-3">
               📝 {order.specialInstructions}
             </div>
           )}
@@ -406,37 +412,44 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'confirmed', 'Order confirmed and preparing');
                   }}
-                  className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
                 >
-                  <CheckCircle size={16} />
-                  <span>🎉 Confirm & Start Magic!</span>
+                  Confirm Order
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     cancelOrder(order.id);
                   }}
-                  className="px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  ❌ Cancel
+                  Cancel
                 </button>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Choose driver:</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {availableDrivers.filter(d => d.status === 'available').map(driver => (
-                    <button
-                      key={driver.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        assignDriver(order.id, driver.id);
-                      }}
-                      className="flex items-center space-x-2 p-3 bg-blue-500 hover:bg-blue-600 border border-blue-600 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md text-white"
-                    >
-                      <span className="text-xl">{driver.avatar}</span>
-                      <span className="text-sm font-semibold">{driver.name}</span>
-                    </button>
-                  ))}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Assign driver:</label>
+                <div className="relative">
+                  <select 
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        assignDriver(order.id, e.target.value);
+                      }
+                    }}
+                    defaultValue=""
+                    className="w-full pl-4 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:border-gray-300 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled className="text-gray-400">👤 Select a driver</option>
+                    {availableDrivers.filter(d => d.status === 'available').map(driver => (
+                      <option key={driver.id} value={driver.id} className="text-gray-700">
+                        {driver.avatar} {driver.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -469,20 +482,18 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'ready', 'Order ready for pickup');
                   }}
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
                 >
-                  <Timer size={16} />
-                  <span>✅ Ready for Hero!</span>
+                  Ready for Pickup
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'picked_up', 'Order picked up by driver');
                   }}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2"
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  <Car size={16} />
-                  <span>🚀 Off We Go!</span>
+                  Picked Up
                 </button>
               </div>
             </div>
@@ -514,11 +525,10 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                   e.stopPropagation();
                   updateOrderStatus(order.id, 'delivered', 'Order delivered successfully');
                 }}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-6 rounded-xl text-base font-bold transition-all duration-200 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-3"
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
               >
-                <CheckCircle size={20} />
-                <span>🎆 Delivered Successfully!</span>
-                <div className="text-2xl animate-bounce">🎉</div>
+                <CheckCircle size={16} />
+                <span>Mark as Delivered</span>
               </button>
             </div>
           </div>
@@ -541,96 +551,81 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
   }
 
   return (
-    <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100 min-h-screen">
-      {/* Success Celebration Banner */}
+    <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100">
+      {/* Success Banner */}
       {recentAction && (
-        <div className="mb-6 animate-slideUp">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-lg border-l-4 border-green-300 animate-celebration">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
-                <CheckCircle size={24} className="text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-1">Amazing Work!</h3>
-                <p className="text-green-100 font-medium">{recentAction.message}</p>
-              </div>
-              <div className="text-4xl animate-bounce">🎉</div>
+        <div className="mb-6">
+          <div className="bg-green-500 text-white px-4 py-3 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <CheckCircle size={20} className="text-white" />
+              <p className="font-medium">{recentAction.message}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Enhanced Board Header with Emotional Design */}
-      <div className="mb-8">
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-4 right-4 animate-gentle-bounce">
-              <Heart size={32} className="text-white" />
-            </div>
-            <div className="absolute bottom-4 left-4 animate-pulse">
-              <Star size={28} className="text-white" />
-            </div>
-            <div className="absolute top-8 left-1/3 animate-bounce" style={{animationDelay: '1s'}}>
-              <Zap size={24} className="text-white" />
-            </div>
-          </div>
-          
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-3 flex items-center space-x-3">
-              <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-heartbeat">
-                <span className="text-3xl">🍕</span>
-              </div>
-              <div>
-                <span>Your Order Symphony</span>
-                <div className="text-orange-100 text-lg font-medium mt-1">
-                  Orchestrating delicious experiences ✨
+      {/* Order Management Container */}
+      <div className="bg-white rounded-lg shadow border border-gray-200">
+        {/* Header Section */}
+        <div className="bg-orange-500 p-4 text-white">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">🍕</span>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Order Management</h2>
+                  <p className="text-orange-100 text-sm">Manage your orders efficiently</p>
                 </div>
               </div>
-            </h2>
+              
+              {/* New Order Button */}
+              <button 
+                onClick={onNewOrderClick}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              >
+                <Plus size={16} />
+                <span>New Order</span>
+              </button>
+            </div>
             
-            {/* Real-time stats with emotional context */}
-            <div className="flex items-center space-x-8 mt-4">
-              <div className="flex items-center space-x-2">
-                <Coffee size={20} className="text-orange-200" />
-                <div>
-                  <span className="text-2xl font-bold">{orders.pending.length + orders.assigned.length + orders.outForDelivery.length}</span>
-                  <p className="text-orange-100 text-sm font-medium">active orders</p>
+            {/* Status Bar */}
+            <div className="mt-3 pt-3 border-t border-white border-opacity-20">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-4 text-orange-100">
+                  <span>
+                    <strong className="text-white">{orders.pending.length}</strong> pending
+                  </span>
+                  <span>
+                    <strong className="text-white">{orders.outForDelivery.length}</strong> out for delivery
+                  </span>
+                  <span>Next delivery in <strong className="text-white">8 minutes</strong></span>
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Award size={20} className="text-orange-200" />
-                <div>
-                  <span className="text-2xl font-bold">{orders.outForDelivery.length}</span>
-                  <p className="text-orange-100 text-sm font-medium">spreading joy</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Timer size={20} className="text-orange-200" />
-                <div>
-                  <span className="text-2xl font-bold">{currentTime.toLocaleTimeString('en-AU', {hour: '2-digit', minute: '2-digit'})}</span>
-                  <p className="text-orange-100 text-sm font-medium">kitchen time</p>
+                <div className="text-orange-100 flex items-center space-x-2">
+                  <Clock size={14} />
+                  <span>{currentTime.toLocaleTimeString('en-AU', {hour: '2-digit', minute: '2-digit'})}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Order Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pending Orders - Awaiting Love */}
+        {/* Order Columns */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pending Orders */}
         <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl shadow-lg border border-blue-200 transform hover:scale-[1.02] transition-all duration-300">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
-            <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-pulse">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                   <Clock size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Awaiting Love</h3>
-                  <p className="text-blue-100 text-xs font-medium">Fresh orders ready for magic!</p>
+                  <h3 className="font-bold text-lg">Pending Orders</h3>
+                  <p className="text-blue-100 text-xs font-medium">New orders awaiting confirmation</p>
                 </div>
               </div>
               <div className="text-center">
@@ -638,14 +633,14 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                   <span className="text-2xl font-bold">{orders.pending.length}</span>
                 </div>
                 {orders.pending.length > 0 && (
-                  <div className="text-blue-100 text-xs mt-1 font-medium animate-pulse">
-                    🔥 Action needed!
+                  <div className="text-blue-100 text-xs mt-1 font-medium">
+                    Action needed
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+          <div className={`p-4 space-y-4 ${orders.pending.length > 2 ? 'max-h-96 overflow-y-auto' : ''}`}>
             {orders.pending.map(order => (
               <OrderCard 
                 key={order.id} 
@@ -656,29 +651,28 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
             ))}
             {orders.pending.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-bounce">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Clock size={32} className="text-blue-500" />
                 </div>
-                <h4 className="text-xl font-bold text-blue-700 mb-2">All caught up! 🎉</h4>
+                <h4 className="text-xl font-bold text-blue-700 mb-2">All caught up!</h4>
                 <p className="text-blue-600 font-medium">No pending orders right now</p>
-                <p className="text-blue-500 text-sm mt-1">Time to prep for the next wave of hungry customers!</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Assigned Orders - Kitchen Magic */}
+        {/* Assigned Orders */}
         <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-xl shadow-lg border border-orange-200 transform hover:scale-[1.02] transition-all duration-300">
           <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
-            <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                   <Car size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Kitchen Magic</h3>
-                  <p className="text-orange-100 text-xs font-medium">Heroes preparing deliciousness!</p>
+                  <h3 className="font-bold text-lg">In Progress</h3>
+                  <p className="text-orange-100 text-xs font-medium">Orders being prepared</p>
                 </div>
               </div>
               <div className="text-center">
@@ -686,14 +680,14 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                   <span className="text-2xl font-bold">{orders.assigned.length}</span>
                 </div>
                 {orders.assigned.length > 0 && (
-                  <div className="text-orange-100 text-xs mt-1 font-medium animate-pulse">
-                    👨‍🍳 In progress
+                  <div className="text-orange-100 text-xs mt-1 font-medium">
+                    In kitchen
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+          <div className={`p-4 space-y-4 ${orders.assigned.length > 2 ? 'max-h-96 overflow-y-auto' : ''}`}>
             {orders.assigned.map(order => (
               <OrderCard 
                 key={order.id} 
@@ -703,29 +697,28 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
             ))}
             {orders.assigned.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-heartbeat">
+                <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Car size={32} className="text-orange-500" />
                 </div>
-                <h4 className="text-xl font-bold text-orange-700 mb-2">Kitchen ready! 👨‍🍳</h4>
+                <h4 className="text-xl font-bold text-orange-700 mb-2">Kitchen ready!</h4>
                 <p className="text-orange-600 font-medium">No orders being prepared</p>
-                <p className="text-orange-500 text-sm mt-1">Your team is standing by to create culinary magic!</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Out for Delivery - Spreading Joy */}
+        {/* Out for Delivery */}
         <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl shadow-lg border border-green-200 transform hover:scale-[1.02] transition-all duration-300">
           <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
-            <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-gentle-bounce">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                   <Navigation size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Spreading Joy</h3>
-                  <p className="text-green-100 text-xs font-medium">Heroes delivering happiness!</p>
+                  <h3 className="font-bold text-lg">Out for Delivery</h3>
+                  <p className="text-green-100 text-xs font-medium">Orders being delivered</p>
                 </div>
               </div>
               <div className="text-center">
@@ -733,14 +726,14 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                   <span className="text-2xl font-bold">{orders.outForDelivery.length}</span>
                 </div>
                 {orders.outForDelivery.length > 0 && (
-                  <div className="text-green-100 text-xs mt-1 font-medium animate-pulse">
-                    🚀 En route to smiles!
+                  <div className="text-green-100 text-xs mt-1 font-medium">
+                    En route
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+          <div className={`p-4 space-y-4 ${orders.outForDelivery.length > 2 ? 'max-h-96 overflow-y-auto' : ''}`}>
             {orders.outForDelivery.map(order => (
               <OrderCard 
                 key={order.id} 
@@ -750,15 +743,16 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
             ))}
             {orders.outForDelivery.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Navigation size={32} className="text-green-500" />
                 </div>
-                <h4 className="text-xl font-bold text-green-700 mb-2">Heroes at rest! 🏀</h4>
+                <h4 className="text-xl font-bold text-green-700 mb-2">All delivered!</h4>
                 <p className="text-green-600 font-medium">No active deliveries</p>
-                <p className="text-green-500 text-sm mt-1">Your delivery team is ready to spread joy across the city!</p>
               </div>
             )}
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

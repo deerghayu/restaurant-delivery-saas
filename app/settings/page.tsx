@@ -267,7 +267,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start space-x-3">
-          <Store className="w-5 h-5 text-blue-500 mt-0.5" />
+          <Store className="w-5 h-5 text-blue-600 mt-0.5" />
           <div>
             <h3 className="font-medium text-blue-900">Restaurant Profile</h3>
             <p className="text-sm text-blue-700 mt-1">
@@ -297,7 +297,7 @@ export default function SettingsPage() {
             Contact Phone *
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Phone className="absolute left-3 top-2.5 h-4 w-4 text-green-500" />
             <input
               type="tel"
               value={formData.phone}
@@ -314,7 +314,7 @@ export default function SettingsPage() {
             Email Address *
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-blue-500" />
             <input
               type="email"
               value={formData.email}
@@ -329,7 +329,7 @@ export default function SettingsPage() {
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-          <MapPin className="w-5 h-5 text-gray-500" />
+          <MapPin className="w-5 h-5 text-red-500" />
           <span>Restaurant Address</span>
         </h3>
 
@@ -402,8 +402,8 @@ export default function SettingsPage() {
   );
 
   const renderBrandingTab = () => (
-    <div className="space-y-6">
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+    <div className="space-y-8">
+      <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
         <div className="flex items-start space-x-3">
           <Palette className="w-5 h-5 text-purple-500 mt-0.5" />
           <div>
@@ -415,13 +415,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="space-y-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               Restaurant Logo
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               {formData.logo_url ? (
                 <div className="space-y-4">
                   <img 
@@ -452,7 +452,7 @@ export default function SettingsPage() {
               )}
             </div>
             
-            <div className="mt-3">
+            <div className="mt-4">
               <input
                 type="url"
                 value={formData.logo_url}
@@ -464,7 +464,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               Primary Brand Color
             </label>
             <div className="flex items-center space-x-4">
@@ -523,7 +523,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
         <div className="flex items-start space-x-3">
-          <Clock className="w-5 h-5 text-green-500 mt-0.5" />
+          <Clock className="w-5 h-5 text-green-600 mt-0.5" />
           <div>
             <h3 className="font-medium text-green-900">Operations & Hours</h3>
             <p className="text-sm text-green-700 mt-1">
@@ -540,7 +540,7 @@ export default function SettingsPage() {
               Average Prep Time (minutes) *
             </label>
             <div className="relative">
-              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-orange-500" />
               <input
                 type="number"
                 min="5"
@@ -559,7 +559,7 @@ export default function SettingsPage() {
 
         <div className="space-y-6">
           <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
-            <Calendar className="w-5 h-5 text-gray-500" />
+            <Calendar className="w-5 h-5 text-blue-500" />
             <span>Business Hours</span>
           </h3>
           
@@ -610,20 +610,20 @@ export default function SettingsPage() {
   );
 
   const renderDeliveryTab = () => (
-    <div className="space-y-6">
-      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <Truck className="w-5 h-5 text-orange-500 mt-0.5" />
+    <div className="space-y-10">
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-8">
+        <div className="flex items-start space-x-4">
+          <Truck className="w-6 h-6 text-orange-500 mt-0.5" />
           <div>
-            <h3 className="font-medium text-orange-900">Pricing & Delivery</h3>
-            <p className="text-sm text-orange-700 mt-1">
+            <h3 className="font-medium text-orange-900 text-lg">Pricing & Delivery</h3>
+            <p className="text-sm text-orange-700 mt-2">
               Configure your delivery fees, minimum orders, and service area.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div>
           <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
             <DollarSign className="w-4 h-4" />
@@ -682,12 +682,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-2">Delivery Area Preview</h4>
-        <p className="text-sm text-gray-600">
+      <div className="bg-gray-50 rounded-lg p-6 mt-8">
+        <h4 className="font-medium text-gray-900 mb-3 text-lg">Delivery Area Preview</h4>
+        <p className="text-sm text-gray-600 mb-4">
           You'll deliver within {formData.delivery_radius}km of {formData.street_address}, {formData.suburb}, {formData.state} {formData.postcode}
         </p>
-        <div className="mt-3 text-sm">
+        <div className="mt-4 text-sm">
           <strong>Pricing Summary:</strong>
           <ul className="list-disc list-inside space-y-1 text-gray-600 mt-1">
             <li>Minimum order: ${formData.minimum_order.toFixed(2)}</li>
@@ -704,10 +704,10 @@ export default function SettingsPage() {
       Math.max(0, Math.ceil((new Date(formData.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
     return (
-      <div className="space-y-6">
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+      <div className="space-y-5">
+        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
           <div className="flex items-start space-x-3">
-            <Crown className="w-5 h-5 text-indigo-500 mt-0.5" />
+            <Crown className="w-5 h-5 text-indigo-600 mt-0.5" />
             <div>
               <h3 className="font-medium text-indigo-900">Subscription & Billing</h3>
               <p className="text-sm text-indigo-700 mt-1">
@@ -717,11 +717,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-medium text-gray-900">Current Plan</h4>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-gray-900">Current Plan</h4>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   formData.subscription_plan === 'trial' 
                     ? 'bg-yellow-100 text-yellow-800'
@@ -734,14 +734,14 @@ export default function SettingsPage() {
               </div>
 
               {formData.subscription_plan === 'trial' && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
                   <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-5 h-5 text-yellow-600" />
+                    <AlertCircle className="w-4 h-4 text-yellow-600" />
                     <div>
-                      <p className="font-medium text-yellow-800">
+                      <p className="font-medium text-yellow-800 text-sm">
                         {trialDaysLeft > 0 ? `${trialDaysLeft} days left in trial` : 'Trial expired'}
                       </p>
-                      <p className="text-sm text-yellow-700">
+                      <p className="text-xs text-yellow-700">
                         Upgrade to continue using all features
                       </p>
                     </div>
@@ -749,7 +749,7 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Status:</span>
                   <span className={`font-medium ${
@@ -772,12 +772,12 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h4 className="text-lg font-medium text-gray-900 mb-4">Account Status</h4>
-              <div className="space-y-3">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3">Account Status</h4>
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4 text-gray-400" />
+                    <Shield className="w-4 h-4 text-green-500" />
                     <span className="text-sm text-gray-600">Account Active</span>
                   </div>
                   <div className={`w-3 h-3 rounded-full ${
@@ -787,7 +787,7 @@ export default function SettingsPage() {
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Users className="w-4 h-4 text-gray-400" />
+                    <Users className="w-4 h-4 text-blue-500" />
                     <span className="text-sm text-gray-600">Restaurant Owner</span>
                   </div>
                   <CheckCircle className="w-4 h-4 text-green-500" />
@@ -796,15 +796,15 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h4 className="text-lg font-medium text-gray-900 mb-4">Available Plans</h4>
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3">Available Plans</h4>
               
-              <div className="space-y-4">
-                <div className="border rounded-lg p-4">
+              <div className="space-y-3">
+                <div className="border border-gray-300 bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium">Starter Plan</h5>
-                    <span className="text-lg font-bold">$29/month</span>
+                    <h5 className="font-medium text-sm">Starter Plan</h5>
+                    <span className="font-bold text-sm">$29/month</span>
                   </div>
                   <ul className="text-sm text-gray-600 space-y-1">
                     <li>• Up to 100 orders/month</li>
@@ -813,13 +813,13 @@ export default function SettingsPage() {
                   </ul>
                 </div>
 
-                <div className="border-2 border-orange-500 rounded-lg p-4 relative">
-                  <div className="absolute -top-2 left-4 bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                <div className="border-2 border-orange-500 rounded-lg p-3 relative">
+                  <div className="absolute -top-2 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded">
                     Recommended
                   </div>
                   <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium">Pro Plan</h5>
-                    <span className="text-lg font-bold">$79/month</span>
+                    <h5 className="font-medium text-sm">Pro Plan</h5>
+                    <span className="font-bold text-sm">$79/month</span>
                   </div>
                   <ul className="text-sm text-gray-600 space-y-1">
                     <li>• Unlimited orders</li>
@@ -831,7 +831,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <button className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              <button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                 Upgrade Now
               </button>
             </div>
@@ -859,160 +859,76 @@ export default function SettingsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
         <div className="container mx-auto px-4 py-8">
-          {/* Profile Completion Celebration */}
-          {celebrateCompletion && (
-            <div className="mb-6 animate-slideUp">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-xl shadow-lg animate-celebration relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 transform -skew-x-12 animate-shimmer"></div>
-                <div className="flex items-center space-x-4 relative z-10">
-                  <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
-                    <Award size={32} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 flex items-center space-x-2">
-                      <span>🎉 Outstanding Progress!</span>
-                      <Sparkles size={24} className="animate-pulse" />
-                    </h3>
-                    <p className="text-purple-100 font-medium text-lg">
-                      Your restaurant profile is {profileCompleteness}% complete! You're building something amazing! 
-                    </p>
-                  </div>
-                  <div className="text-6xl animate-gentle-bounce">🌟</div>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Enhanced Header with Progress */}
+          {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                  className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
                 >
-                  <ArrowLeft className="w-6 h-6 text-gray-600" />
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
                 <div>
-                  <h1 className="text-4xl font-bold text-gray-900 flex items-center space-x-3">
-                    <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
-                      <SettingsIcon className="w-8 h-8 text-white" />
-                    </div>
-                    <span>Your Restaurant Journey</span>
+                  <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
+                    <SettingsIcon className="w-7 h-7 text-orange-500" />
+                    <span>Restaurant Settings</span>
                   </h1>
-                  <p className="text-gray-600 text-lg mt-2">Crafting the perfect experience for your customers ✨</p>
+                  <p className="text-gray-600 mt-1">Configure your restaurant profile and preferences</p>
                 </div>
               </div>
               
-              {/* Profile Completeness Indicator */}
+              {/* Profile Completeness */}
               <div className="text-right">
-                <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                      <TrendingUp size={16} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Profile Strength</p>
-                      <p className="text-2xl font-bold text-gray-900">{profileCompleteness}%</p>
-                    </div>
-                  </div>
-                  <div className="w-32 bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="bg-white rounded-lg p-4 shadow border border-gray-200">
+                  <div className="text-sm text-gray-600 mb-1">Profile Complete</div>
+                  <div className="text-xl font-bold text-gray-900 mb-2">{profileCompleteness}%</div>
+                  <div className="w-24 bg-gray-200 rounded-full h-2">
                     <div 
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        profileCompleteness >= 90 ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
-                        profileCompleteness >= 70 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
-                        profileCompleteness >= 50 ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
-                        'bg-gradient-to-r from-red-500 to-red-600'
-                      }`}
+                      className="h-full rounded-full bg-green-500 transition-all"
                       style={{ width: `${profileCompleteness}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {profileCompleteness >= 90 ? 'Exceptional! 🌟' :
-                     profileCompleteness >= 70 ? 'Looking great! 👍' :
-                     profileCompleteness >= 50 ? 'Good progress! 📈' :
-                     'Let\'s build this! 🚀'}
-                  </p>
                 </div>
               </div>
             </div>
-            
-            {/* Encouraging Progress Message */}
-            {profileCompleteness < 100 && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-center space-x-3">
-                  <Heart size={20} className="text-blue-500 animate-heartbeat" />
-                  <div>
-                    <p className="font-medium text-blue-900">
-                      {profileCompleteness >= 90 ? 'Almost there! Your restaurant profile is nearly perfect!' :
-                       profileCompleteness >= 70 ? 'You\'re doing amazing! Just a few more details to make it shine!' :
-                       profileCompleteness >= 50 ? 'Great momentum! Keep adding those important details!' :
-                       'Every great restaurant starts here! Let\'s build your perfect profile together!'}
-                    </p>
-                    <p className="text-blue-700 text-sm mt-1">
-                      Complete profiles get more customer trust and better search visibility! 📈
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           
-          {/* Enhanced Save Button */}
+          {/* Save Button */}
           {hasChanges && (
-            <div className="fixed bottom-8 right-8 z-50">
+            <div className="fixed bottom-8 right-8 z-[9999]">
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-full font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 disabled:opacity-50 animate-gentle-bounce"
+                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg transition-colors flex items-center space-x-2 disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span className="text-lg">Saving Your Magic...</span>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>
-                    <Save size={20} />
-                    <span className="text-lg">💾 Save My Progress</span>
-                    <Zap size={20} className="animate-pulse" />
+                    <Save size={16} />
+                    <span>Save Changes</span>
                   </>
                 )}
               </button>
             </div>
           )}
 
-          {/* Enhanced Message with Celebration */}
+          {/* Message */}
           {message && (
-            <div className={`mb-6 animate-slideUp ${
-              message.type === 'success' ? 
-                'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg animate-celebration' : 
-                'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-            } rounded-xl p-6`}>
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center ${
-                  message.type === 'success' ? 'animate-bounce' : ''
-                }`}>
-                  {message.type === 'success' ? 
-                    <CheckCircle size={24} className="text-white" /> : 
-                    <AlertCircle size={24} className="text-white" />
-                  }
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-1">
-                    {message.type === 'success' ? '🎉 Amazing Work!' : '⚠️ Hold On!'}
-                  </h3>
-                  <p className={`font-medium ${
-                    message.type === 'success' ? 'text-green-100' : 'text-red-100'
-                  }`}>
-                    {message.type === 'success' ? 
-                      `${message.text} Your restaurant is getting better every day! 🌟` : 
-                      message.text}
-                  </p>
-                </div>
-                {message.type === 'success' && (
-                  <div className="text-4xl animate-gentle-bounce">⭐</div>
-                )}
+            <div className={`mb-6 ${
+              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white rounded-lg p-4`}>
+              <div className="flex items-center space-x-3">
+                {message.type === 'success' ? 
+                  <CheckCircle size={20} className="text-white" /> : 
+                  <AlertCircle size={20} className="text-white" />
+                }
+                <p className="font-medium">{message.text}</p>
               </div>
             </div>
           )}
@@ -1024,7 +940,7 @@ export default function SettingsPage() {
                 <div className="p-4 border-b border-gray-200">
                   <h2 className="font-semibold text-gray-900">Settings</h2>
                 </div>
-                <nav className="space-y-1">
+                <nav className="space-y-1 p-2">
                   {settingsTabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
@@ -1049,7 +965,7 @@ export default function SettingsPage() {
 
             {/* Settings Content */}
             <div className="flex-1">
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-lg shadow-sm p-8">
                 {activeTab === 'profile' && renderProfileTab()}
                 {activeTab === 'branding' && renderBrandingTab()}
                 {activeTab === 'operations' && renderOperationsTab()}

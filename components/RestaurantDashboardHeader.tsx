@@ -8,15 +8,25 @@ import { getBrandColor, getRestaurantDisplayName } from "@/utils/restaurant";
 
 interface RestaurantDashboardHeaderProps {
   onNewOrder?: (order: any) => void;
+  showNewOrderModal?: boolean;
+  setShowNewOrderModal?: (show: boolean) => void;
 }
 
-const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProps) => {
+const RestaurantDashboardHeader = ({ 
+  onNewOrder, 
+  showNewOrderModal: externalShowModal, 
+  setShowNewOrderModal: externalSetShowModal 
+}: RestaurantDashboardHeaderProps) => {
   const { user, restaurant, signOut } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNewOrderModal, setShowNewOrderModal] = useState(false);
+  const [internalShowModal, setInternalShowModal] = useState(false);
+  
+  // Use external state if provided, otherwise use internal state
+  const showNewOrderModal = externalShowModal !== undefined ? externalShowModal : internalShowModal;
+  const setShowNewOrderModal = externalSetShowModal || setInternalShowModal;
   const [todayStats, setTodayStats] = useState({
     ordersCompleted: 23,
     activeDrivers: 3,
@@ -106,231 +116,126 @@ const RestaurantDashboardHeader = ({ onNewOrder }: RestaurantDashboardHeaderProp
 
   return (
     <div 
-      className="text-white shadow-lg"
+      className="text-white shadow-lg relative"
       style={{ 
-        background: `linear-gradient(to right, ${brandColor}, ${brandColor}dd)` 
+        background: `linear-gradient(135deg, #dc2626 0%, #ea580c 100%)` 
       }}
     >
-      {/* Main Header */}
-      <div className="px-6 py-4">
+
+      <div className="px-6 py-6">
         <div className="flex items-center justify-between">
           {/* Left: Restaurant Branding & Greeting */}
           <div className="flex items-center space-x-4">
             {/* Restaurant Logo */}
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
               {restaurant?.logo_url ? (
                 <img 
                   src={restaurant.logo_url} 
                   alt={`${restaurant.name} logo`}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <span className="text-2xl">🍕</span>
+                <span className="text-xl">🍕</span>
               )}
             </div>
 
-            {/* Greeting & Restaurant Name */}
+            {/* Restaurant Info & Performance Message */}
             <div>
-              <h1 className="text-2xl font-bold">{getRestaurantDisplayName(restaurant)}</h1>
+              <h1 className="text-2xl font-bold mb-1">{getRestaurantDisplayName(restaurant)}</h1>
               <p className="text-orange-100 text-sm">
-                {getTimeBasedGreeting()}, {user?.email?.split('@')[0] || 'User'}!
-                <span className="ml-2 text-xs opacity-75">
-                  {formatDate(currentTime)} • {restaurant?.suburb}, {restaurant?.state}
-                </span>
+                {getTimeBasedGreeting()}, {user?.email?.split('@')[0] || 'User'}! • {formatDate(currentTime)}
               </p>
             </div>
           </div>
 
-          {/* Right: Quick Actions */}
-          <div className="flex items-center space-x-3">
-            {/* New Order Button */}
-            <button 
-              onClick={() => setShowNewOrderModal(true)}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
-            >
-              <Plus size={20} />
-              <span>New Order</span>
-            </button>
-
-            {/* Notifications */}
-            <div className="relative">
-              <button className="bg-blue-500 hover:bg-blue-400 p-3 rounded-lg transition-colors duration-200">
-                <Bell size={20} />
-              </button>
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-xs font-bold">2</span>
+          {/* Right: Quick Actions & Stats */}
+          <div className="flex items-center space-x-6">
+            {/* Compact Stats */}
+            <div className="hidden lg:flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{todayStats.ordersCompleted}</div>
+                <div className="text-xs opacity-80">orders today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{todayStats.activeDrivers}</div>
+                <div className="text-xs opacity-80">active drivers</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{todayStats.avgDeliveryTime}min</div>
+                <div className="text-xs opacity-80">avg prep time</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{todayStats.onTimeRate}%</div>
+                <div className="text-xs opacity-80">on-time rate</div>
               </div>
             </div>
 
-            {/* Online Status Toggle */}
-            <div className="flex items-center space-x-2 bg-orange-600 bg-opacity-70 px-3 py-2 rounded-lg">
-              <div
-                className={`w-3 h-3 rounded-full ${
-                  isOnline ? "bg-green-400" : "bg-gray-400"
-                } animate-pulse`}
-              ></div>
-              <span className="text-sm font-medium">
-                {isOnline ? "Online" : "Offline"}
-              </span>
-            </div>
-
-            {/* User Menu */}
-            <div className="relative">
-              <button 
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="bg-orange-600 bg-opacity-70 hover:bg-opacity-90 p-3 rounded-lg transition-colors duration-200 flex items-center space-x-2"
-              >
-                <User size={20} />
-              </button>
-              
-              {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="text-sm text-gray-600 font-medium">{user?.email}</p>
-                    <p className="text-xs text-gray-500">{restaurant?.name}</p>
-                  </div>
-                  <Link
-                    href="/drivers"
-                    onClick={() => setShowUserMenu(false)}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                  >
-                    <Users size={16} />
-                    <span>Drivers</span>
-                  </Link>
-                  <Link
-                    href="/settings"
-                    onClick={() => setShowUserMenu(false)}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                  >
-                    <Settings size={16} />
-                    <span>Settings</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      signOut();
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                  >
-                    <LogOut size={16} />
-                    <span>Sign Out</span>
-                  </button>
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-3">
+              {/* Notifications */}
+              <div className="relative">
+                <button className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-lg">
+                  <Bell size={18} />
+                </button>
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold">2</span>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+              </div>
 
-      {/* Enhanced Performance Stats Bar with Emotional Design */}
-      <div className={`${performanceMessage.bgColor} px-6 py-4 border-t border-white border-opacity-20 relative overflow-hidden`}>
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent transform -skew-x-12"></div>
-        </div>
-        
-        <div className="flex items-center justify-between relative z-10">
-          {/* Enhanced Performance Message */}
-          <div className="flex items-center space-x-3">
-            <div className={`w-3 h-3 rounded-full bg-white animate-pulse shadow-lg`}></div>
-            <div className="flex flex-col">
-              <span className={`${performanceMessage.textColor} text-base font-semibold leading-tight`}>
-                {performanceMessage.text}
-              </span>
-              <span className={`${performanceMessage.textColor} opacity-90 text-xs mt-0.5`}>
-                Keep up the amazing hospitality! 🏆
-              </span>
-            </div>
-          </div>
+              {/* Online Status */}
+              <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-2 rounded-lg">
+                <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-400" : "bg-gray-400"}`}></div>
+                <span className="text-sm">{isOnline ? "Online" : "Offline"}</span>
+              </div>
 
-          {/* Today's Emotional Metrics */}
-          <div className="flex items-center space-x-8">
-            {/* Happy Customers */}
-            <div className="flex items-center space-x-2 text-white">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <TrendingUp size={14} className="text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-none">
-                  {todayStats.ordersCompleted}
-                </span>
-                <span className="text-xs opacity-90">
-                  happy customers
-                </span>
-              </div>
-            </div>
-
-            {/* Delivery Family */}
-            <div className="flex items-center space-x-2 text-white">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <Users size={14} className="text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-none">
-                  {todayStats.activeDrivers}
-                </span>
-                <span className="text-xs opacity-90">
-                  delivery heroes
-                </span>
-              </div>
-            </div>
-
-            {/* Kitchen Efficiency */}
-            <div className="flex items-center space-x-2 text-white">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <Clock size={14} className="text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-none">
-                  {todayStats.avgDeliveryTime}min
-                </span>
-                <span className="text-xs opacity-90">
-                  kitchen magic
-                </span>
-              </div>
-            </div>
-
-            {/* Excellence Rate */}
-            <div className="flex items-center space-x-2 text-white">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <MapPin size={14} className="text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-none">
-                  {todayStats.onTimeRate}%
-                </span>
-                <span className="text-xs opacity-90">
-                  excellence rate
-                </span>
+              {/* User Menu */}
+              <div className="relative z-[99999]">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-lg"
+                >
+                  <User size={18} />
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-[99999]">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm text-gray-600 font-medium">{user?.email}</p>
+                      <p className="text-xs text-gray-500">{restaurant?.name}</p>
+                    </div>
+                    <Link
+                      href="/drivers"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <Users size={16} />
+                      <span>Drivers</span>
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <Settings size={16} />
+                      <span>Settings</span>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        signOut();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <LogOut size={16} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Quick Status Overview */}
-      <div className="bg-red-700 bg-opacity-30 px-6 py-2">
-        <div className="flex items-center justify-between text-sm">
-          {/* Left: Current Status */}
-          <div className="flex items-center space-x-4 text-orange-200">
-            <span>
-              📋 <strong className="text-white">4</strong> pending orders
-            </span>
-            <span>
-              🚗 <strong className="text-white">6</strong> out for delivery
-            </span>
-            <span>
-              ⏰ Next delivery in{" "}
-              <strong className="text-white">8 minutes</strong>
-            </span>
-          </div>
-
-          {/* Right: Time */}
-          <div className="text-orange-200 flex items-center space-x-1">
-            <Clock size={14} className="text-orange-300" />
-            <span className="font-mono">{formatTime(currentTime)}</span>
-          </div>
-        </div>
       </div>
 
       {/* New Order Modal */}

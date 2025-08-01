@@ -12,6 +12,24 @@
   body {
     @apply bg-gradient-to-br from-orange-50 to-red-50 min-h-screen;
   }
+  
+  body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  body::-webkit-scrollbar-track {
+    background: #fed7aa;
+    border-radius: 4px;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background: #fd7e14;
+    border-radius: 4px;
+  }
+
+  body::-webkit-scrollbar-thumb:hover {
+    background: #e8590c;
+  }
 }
 
 @layer components {
@@ -51,19 +69,23 @@
   background: #e8590c;
 }
 
-/* Animations */
-@keyframes pulse-success {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+/* Thicker scrollbar for modal */
+.modal-scrollbar::-webkit-scrollbar {
+  width: 10px;
 }
 
-.pulse-success {
-  animation: pulse-success 2s infinite;
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: #fed7aa;
+  border-radius: 5px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #fd7e14;
+  border-radius: 5px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #e8590c;
 }
 
 /* Loading states */
@@ -82,86 +104,12 @@
   }
 }
 
-/* Emotional UX Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) skewX(-12deg);
-  }
-  100% {
-    transform: translateX(300%) skewX(-12deg);
-  }
+/* Simple celebration animation for order status updates */
+.animate-celebration {
+  animation: celebration 0.6s ease-in-out;
 }
 
 @keyframes celebration {
-  0%, 100% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.05) rotate(1deg);
-  }
-  75% {
-    transform: scale(1.02) rotate(-1deg);
-  }
-}
-
-@keyframes heartbeat {
-  0%, 28%, 70% {
-    transform: scale(1);
-  }
-  14%, 42% {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes gentle-bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slideUp {
-  animation: slideUp 0.4s ease-out;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-.animate-celebration {
-  animation: celebration 0.6s ease-out;
-}
-
-.animate-heartbeat {
-  animation: heartbeat 1.5s ease-in-out infinite;
-}
-
-.animate-gentle-bounce {
-  animation: gentle-bounce 2s ease-in-out infinite;
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
