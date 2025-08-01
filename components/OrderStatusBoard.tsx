@@ -10,8 +10,14 @@ import {
   AlertCircle, 
   Timer,
   DollarSign,
-  Navigation
+  Navigation,
+  Heart,
+  Star,
+  Zap,
+  Coffee,
+  Award
 } from 'lucide-react';
+import DelightfulLoading from './DelightfulLoading';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -24,6 +30,8 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(true);
+  const [celebratingOrder, setCelebratingOrder] = useState<string | null>(null);
+  const [recentAction, setRecentAction] = useState<{orderId: string, action: string, message: string} | null>(null);
   const [orders, setOrders] = useState({
     pending: [] as any[],
     assigned: [] as any[],
@@ -183,8 +191,25 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
     }
   };
 
-  // Update order status
+  // Enhanced update order status with celebrations
   const updateOrderStatus = async (orderId: string, newStatus: string, notes?: string) => {
+    // Trigger celebration effect
+    setCelebratingOrder(orderId);
+    
+    // Set action feedback
+    const actionMessages = {
+      'confirmed': '🎉 Order confirmed! Kitchen magic begins!',
+      'ready': '✨ Ready for pickup! Your creation awaits!',
+      'picked_up': '🚀 Off they go! Spreading joy across the city!',
+      'delivered': '🎆 Success! Another happy customer created!'
+    };
+    
+    setRecentAction({
+      orderId,
+      action: newStatus,
+      message: actionMessages[newStatus] || `Order ${newStatus.replace('_', ' ')}!`
+    });
+    
     try {
       const updateData: any = { 
         status: newStatus,
@@ -230,8 +255,16 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
 
       // Refresh orders
       fetchOrders();
+      
+      // Clear celebration after animation
+      setTimeout(() => {
+        setCelebratingOrder(null);
+        setRecentAction(null);
+      }, 3000);
     } catch (error) {
       console.error('Error in updateOrderStatus:', error);
+      setCelebratingOrder(null);
+      setRecentAction(null);
     }
   };
 
@@ -297,9 +330,11 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
 
     return (
       <div 
-        className={`bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer ${
-          selectedOrder?.id === order.id ? 'border-orange-400 shadow-lg ring-2 ring-orange-200' : 'border-gray-200'
-        } ${isPending ? getPriorityStyle(order.priority) : ''}`}
+        className={`bg-white rounded-xl shadow-sm border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+          selectedOrder?.id === order.id ? 'border-orange-400 shadow-xl ring-2 ring-orange-200 scale-[1.02]' : 'border-gray-200'
+        } ${isPending ? getPriorityStyle(order.priority) : ''} ${
+          celebratingOrder === order.id ? 'animate-celebration ring-4 ring-green-300 border-green-400' : ''
+        }`}
         onClick={() => setSelectedOrder(order)}
       >
         {/* Order Header */}
@@ -371,18 +406,19 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'confirmed', 'Order confirmed and preparing');
                   }}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                  className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                 >
-                  Confirm Order
+                  <CheckCircle size={16} />
+                  <span>🎉 Confirm & Start Magic!</span>
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     cancelOrder(order.id);
                   }}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  Cancel
+                  ❌ Cancel
                 </button>
               </div>
               <div>
@@ -433,18 +469,20 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'ready', 'Order ready for pickup');
                   }}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                 >
-                  Ready for Pickup
+                  <Timer size={16} />
+                  <span>✅ Ready for Hero!</span>
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'picked_up', 'Order picked up by driver');
                   }}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2"
                 >
-                  Picked Up
+                  <Car size={16} />
+                  <span>🚀 Off We Go!</span>
                 </button>
               </div>
             </div>
@@ -476,10 +514,11 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
                   e.stopPropagation();
                   updateOrderStatus(order.id, 'delivered', 'Order delivered successfully');
                 }}
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-6 rounded-xl text-base font-bold transition-all duration-200 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-3"
               >
-                <CheckCircle size={16} />
-                <span>Mark as Delivered</span>
+                <CheckCircle size={20} />
+                <span>🎆 Delivered Successfully!</span>
+                <div className="text-2xl animate-bounce">🎉</div>
               </button>
             </div>
           </div>
@@ -491,38 +530,119 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
   if (loading) {
     return (
       <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading orders...</p>
-        </div>
+        <DelightfulLoading 
+          type="cooking"
+          message="Preparing your delivery hub..."
+          submessage="Getting ready to manage your orders like a pro!"
+          size="lg"
+        />
       </div>
     );
   }
 
   return (
     <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100 min-h-screen">
-      {/* Board Header */}
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center space-x-2">
-          <span className="text-3xl">🍕</span>
-          <span>Your Delivery Hub</span>
-        </h2>
-        <p className="text-gray-800 font-medium">Keep every order flowing smoothly from kitchen to happy customers</p>
+      {/* Success Celebration Banner */}
+      {recentAction && (
+        <div className="mb-6 animate-slideUp">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-lg border-l-4 border-green-300 animate-celebration">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
+                <CheckCircle size={24} className="text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-1">Amazing Work!</h3>
+                <p className="text-green-100 font-medium">{recentAction.message}</p>
+              </div>
+              <div className="text-4xl animate-bounce">🎉</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Board Header with Emotional Design */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 right-4 animate-gentle-bounce">
+              <Heart size={32} className="text-white" />
+            </div>
+            <div className="absolute bottom-4 left-4 animate-pulse">
+              <Star size={28} className="text-white" />
+            </div>
+            <div className="absolute top-8 left-1/3 animate-bounce" style={{animationDelay: '1s'}}>
+              <Zap size={24} className="text-white" />
+            </div>
+          </div>
+          
+          <div className="relative z-10">
+            <h2 className="text-4xl font-bold mb-3 flex items-center space-x-3">
+              <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-heartbeat">
+                <span className="text-3xl">🍕</span>
+              </div>
+              <div>
+                <span>Your Order Symphony</span>
+                <div className="text-orange-100 text-lg font-medium mt-1">
+                  Orchestrating delicious experiences ✨
+                </div>
+              </div>
+            </h2>
+            
+            {/* Real-time stats with emotional context */}
+            <div className="flex items-center space-x-8 mt-4">
+              <div className="flex items-center space-x-2">
+                <Coffee size={20} className="text-orange-200" />
+                <div>
+                  <span className="text-2xl font-bold">{orders.pending.length + orders.assigned.length + orders.outForDelivery.length}</span>
+                  <p className="text-orange-100 text-sm font-medium">active orders</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Award size={20} className="text-orange-200" />
+                <div>
+                  <span className="text-2xl font-bold">{orders.outForDelivery.length}</span>
+                  <p className="text-orange-100 text-sm font-medium">spreading joy</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Timer size={20} className="text-orange-200" />
+                <div>
+                  <span className="text-2xl font-bold">{currentTime.toLocaleTimeString('en-AU', {hour: '2-digit', minute: '2-digit'})}</span>
+                  <p className="text-orange-100 text-sm font-medium">kitchen time</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Order Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pending Orders */}
-        <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg shadow-sm border border-blue-200">
-          <div className="bg-blue-600 text-white px-4 py-3 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center space-x-2 text-lg">
-                <Clock size={18} />
-                <span>Pending Orders</span>
-              </h3>
-              <span className="bg-blue-500 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                {orders.pending.length}
-              </span>
+        {/* Pending Orders - Awaiting Love */}
+        <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl shadow-lg border border-blue-200 transform hover:scale-[1.02] transition-all duration-300">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-pulse">
+                  <Clock size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Awaiting Love</h3>
+                  <p className="text-blue-100 text-xs font-medium">Fresh orders ready for magic!</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                  <span className="text-2xl font-bold">{orders.pending.length}</span>
+                </div>
+                {orders.pending.length > 0 && (
+                  <div className="text-blue-100 text-xs mt-1 font-medium animate-pulse">
+                    🔥 Action needed!
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
@@ -535,25 +655,42 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
               />
             ))}
             {orders.pending.length === 0 && (
-              <div className="text-center text-blue-600 py-8">
-                <Clock size={32} className="mx-auto mb-2 text-blue-400" />
-                <p className="font-medium">No pending orders</p>
+              <div className="text-center py-12">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-bounce">
+                  <Clock size={32} className="text-blue-500" />
+                </div>
+                <h4 className="text-xl font-bold text-blue-700 mb-2">All caught up! 🎉</h4>
+                <p className="text-blue-600 font-medium">No pending orders right now</p>
+                <p className="text-blue-500 text-sm mt-1">Time to prep for the next wave of hungry customers!</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Assigned Orders */}
-        <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-lg shadow-sm border border-orange-200">
-          <div className="bg-orange-600 text-white px-4 py-3 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center space-x-2 text-lg">
-                <Car size={18} />
-                <span>Assigned</span>
-              </h3>
-              <span className="bg-orange-500 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                {orders.assigned.length}
-              </span>
+        {/* Assigned Orders - Kitchen Magic */}
+        <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-xl shadow-lg border border-orange-200 transform hover:scale-[1.02] transition-all duration-300">
+          <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
+                  <Car size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Kitchen Magic</h3>
+                  <p className="text-orange-100 text-xs font-medium">Heroes preparing deliciousness!</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                  <span className="text-2xl font-bold">{orders.assigned.length}</span>
+                </div>
+                {orders.assigned.length > 0 && (
+                  <div className="text-orange-100 text-xs mt-1 font-medium animate-pulse">
+                    👨‍🍳 In progress
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
@@ -565,25 +702,42 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
               />
             ))}
             {orders.assigned.length === 0 && (
-              <div className="text-center text-orange-600 py-8">
-                <Car size={32} className="mx-auto mb-2 text-orange-400" />
-                <p className="font-medium">No assigned orders</p>
+              <div className="text-center py-12">
+                <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-heartbeat">
+                  <Car size={32} className="text-orange-500" />
+                </div>
+                <h4 className="text-xl font-bold text-orange-700 mb-2">Kitchen ready! 👨‍🍳</h4>
+                <p className="text-orange-600 font-medium">No orders being prepared</p>
+                <p className="text-orange-500 text-sm mt-1">Your team is standing by to create culinary magic!</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Out for Delivery */}
-        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-lg shadow-sm border border-green-200">
-          <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center space-x-2 text-lg">
-                <Navigation size={18} />
-                <span>Out for Delivery</span>
-              </h3>
-              <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                {orders.outForDelivery.length}
-              </span>
+        {/* Out for Delivery - Spreading Joy */}
+        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl shadow-lg border border-green-200 transform hover:scale-[1.02] transition-all duration-300">
+          <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-5 transform -skew-x-12 animate-shimmer"></div>
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-gentle-bounce">
+                  <Navigation size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Spreading Joy</h3>
+                  <p className="text-green-100 text-xs font-medium">Heroes delivering happiness!</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                  <span className="text-2xl font-bold">{orders.outForDelivery.length}</span>
+                </div>
+                {orders.outForDelivery.length > 0 && (
+                  <div className="text-green-100 text-xs mt-1 font-medium animate-pulse">
+                    🚀 En route to smiles!
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
@@ -595,9 +749,13 @@ const OrderStatusBoard = ({ newOrder }: OrderStatusBoardProps) => {
               />
             ))}
             {orders.outForDelivery.length === 0 && (
-              <div className="text-center text-green-600 py-8">
-                <Navigation size={32} className="mx-auto mb-2 text-green-400" />
-                <p className="font-medium">No deliveries in progress</p>
+              <div className="text-center py-12">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                  <Navigation size={32} className="text-green-500" />
+                </div>
+                <h4 className="text-xl font-bold text-green-700 mb-2">Heroes at rest! 🏀</h4>
+                <p className="text-green-600 font-medium">No active deliveries</p>
+                <p className="text-green-500 text-sm mt-1">Your delivery team is ready to spread joy across the city!</p>
               </div>
             )}
           </div>

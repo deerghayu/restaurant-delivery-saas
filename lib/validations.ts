@@ -2,30 +2,13 @@ import { z } from 'zod';
 
 // Driver validation schema
 export const createDriverSchema = z.object({
-  restaurant_id: z.string().uuid('Invalid restaurant ID'),
-  name: z.string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must be less than 50 characters')
-    .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
-  phone: z.string()
-    .min(10, 'Phone number must be at least 10 digits')
-    .max(15, 'Phone number must be less than 15 digits')
-    .regex(/^[\d\s\-\+\(\)]+$/, 'Invalid phone number format'),
-  email: z.string()
-    .email('Invalid email format')
-    .optional()
-    .or(z.literal('')),
-  avatar_emoji: z.string()
-    .min(1, 'Avatar emoji is required')
-    .max(10, 'Avatar emoji too long'),
-  vehicle_type: z.enum(['car', 'bike', 'scooter', 'motorcycle', 'van'], {
-    errorMap: () => ({ message: 'Invalid vehicle type' })
-  }),
-  license_plate: z.string()
-    .max(10, 'License plate must be less than 10 characters')
-    .regex(/^[A-Z0-9\s-]*$/, 'License plate can only contain letters, numbers, spaces, and hyphens')
-    .optional()
-    .or(z.literal(''))
+  restaurant_id: z.string().min(1, 'Restaurant ID is required'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  email: z.string().nullable().optional(),
+  avatar_emoji: z.string().min(1, 'Avatar emoji is required'),
+  vehicle_type: z.enum(['car', 'bike', 'scooter', 'motorcycle', 'van']),
+  license_plate: z.string().nullable().optional()
 });
 
 export const updateDriverSchema = createDriverSchema.extend({
@@ -98,15 +81,20 @@ export const createOrderSchema = z.object({
 
 // Helper function to validate and return errors
 export const validateData = <T>(schema: z.ZodSchema<T>, data: unknown) => {
-  const result = schema.safeParse(data);
-  
-  if (!result.success) {
-    const errors = result.error.errors.map(err => ({
-      field: err.path.join('.'),
-      message: err.message
-    }));
-    return { success: false, errors, data: null };
+  try {
+    const result = schema.safeParse(data);
+    
+    if (!result.success) {
+      const errors = result.error?.errors?.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      })) || [];
+      return { success: false, errors, data: null };
+    }
+    
+    return { success: true, errors: null, data: result.data };
+  } catch (err) {
+    console.error('Error in validateData:', err);
+    return { success: false, errors: [{ field: 'unknown', message: 'Validation error occurred' }], data: null };
   }
-  
-  return { success: true, errors: null, data: result.data };
 };

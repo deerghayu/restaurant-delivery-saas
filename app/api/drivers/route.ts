@@ -9,8 +9,10 @@ export async function POST(request: NextRequest) {
 
     // Validate input data
     const validation = validateData(createDriverSchema, body);
+    
     if (!validation.success) {
-      return createApiResponse(null, `Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`, 400);
+      const errorMessages = validation.errors?.map(e => e.message).join(', ') || 'Unknown validation error';
+      return createApiResponse(null, `Validation failed: ${errorMessages}`, 400);
     }
 
     const validatedData = validation.data!;

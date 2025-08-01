@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Driver } from "@/types/database";
 import { getRestaurantId } from "@/utils/restaurant";
 import { VEHICLE_TYPES, APP_CONFIG, SUCCESS_MESSAGES, ERROR_MESSAGES } from "@/lib/constants";
+import DelightfulLoading from "@/components/DelightfulLoading";
 import { 
   ArrowLeft, 
   Plus, 
@@ -263,10 +264,12 @@ export default function DriversPage() {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading drivers...</p>
-          </div>
+          <DelightfulLoading 
+            type="delivering"
+            message="Loading your delivery family..."
+            submessage="Getting ready to meet your amazing team!"
+            size="lg"
+          />
         </div>
       </ProtectedRoute>
     );
@@ -416,30 +419,52 @@ export default function DriversPage() {
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
-                {drivers.map((driver) => (
-                  <div key={driver.id} className="p-6 hover:bg-gray-50 transition-colors">
+                {drivers.map((driver, index) => (
+                  <div 
+                    key={driver.id} 
+                    className="p-6 hover:bg-gradient-to-r hover:from-orange-25 hover:to-amber-25 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-md rounded-lg mx-2"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl">
-                          {driver.avatar_emoji}
+                        <div className="relative group">
+                          <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center text-3xl shadow-md group-hover:shadow-lg transition-all duration-300 transform group-hover:scale-110">
+                            {driver.avatar_emoji}
+                          </div>
+                          {/* Status indicator */}
+                          <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white shadow-sm ${
+                            driver.status === 'available' ? 'bg-green-400 animate-pulse' :
+                            driver.status === 'delivering' ? 'bg-blue-400 animate-bounce' :
+                            driver.status === 'busy' ? 'bg-yellow-400' : 'bg-gray-400'
+                          }`}></div>
                         </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{driver.name}</h3>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
+                              {driver.name}
+                            </h3>
+                            {driver.total_deliveries > 100 && (
+                              <span className="text-yellow-500 text-lg" title="Delivery Champion!">🏆</span>
+                            )}
+                            {driver.average_rating >= 4.8 && (
+                              <span className="text-purple-500 text-lg" title="Customer Favorite!">⭐</span>
+                            )}
+                          </div>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1 hover:text-orange-600 transition-colors">
                               <Phone className="w-4 h-4" />
                               <span>{driver.phone}</span>
                             </div>
                             {driver.email && (
-                              <div className="flex items-center space-x-1">
+                              <div className="flex items-center space-x-1 hover:text-orange-600 transition-colors">
                                 <Mail className="w-4 h-4" />
                                 <span>{driver.email}</span>
                               </div>
                             )}
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1 hover:text-orange-600 transition-colors">
                               <Car className="w-4 h-4" />
-                              <span className="capitalize">{driver.vehicle_type}</span>
-                              {driver.license_plate && <span>• {driver.license_plate}</span>}
+                              <span className="capitalize font-medium">{driver.vehicle_type}</span>
+                              {driver.license_plate && <span className="text-gray-500">• {driver.license_plate}</span>}
                             </div>
                           </div>
                         </div>
@@ -452,10 +477,27 @@ export default function DriversPage() {
                           <span className="capitalize">{driver.status}</span>
                         </span>
                         
-                        {/* Performance */}
-                        <div className="text-right text-sm">
-                          <p className="font-medium text-gray-900">{driver.total_deliveries} deliveries</p>
-                          <p className="text-gray-600">⭐ {driver.average_rating.toFixed(1)} rating</p>
+                        {/* Enhanced Performance with Emotional Feedback */}
+                        <div className="text-right">
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-2 rounded-lg border border-green-100 mb-2">
+                            <p className="font-bold text-green-700 text-lg">{driver.total_deliveries}</p>
+                            <p className="text-green-600 text-xs font-medium">
+                              {driver.total_deliveries > 50 ? 'Delivery Legend' : 
+                               driver.total_deliveries > 20 ? 'Rising Star' : 
+                               driver.total_deliveries > 5 ? 'Getting Going' : 'New Hero'}
+                            </p>
+                          </div>
+                          <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-2 rounded-lg border border-purple-100">
+                            <div className="flex items-center justify-end space-x-1">
+                              <span className="text-yellow-400 text-sm">⭐</span>
+                              <span className="font-bold text-purple-700 text-lg">{driver.average_rating.toFixed(1)}</span>
+                            </div>
+                            <p className="text-purple-600 text-xs font-medium">
+                              {driver.average_rating >= 4.8 ? 'Customer Favorite!' :
+                               driver.average_rating >= 4.5 ? 'Highly Rated' :
+                               driver.average_rating >= 4.0 ? 'Good Service' : 'Improving'}
+                            </p>
+                          </div>
                         </div>
                         
                         {/* Actions */}
@@ -500,17 +542,28 @@ export default function DriversPage() {
           </div>
         </div>
 
-        {/* New/Edit Driver Modal */}
+        {/* Enhanced New/Edit Driver Modal with Emotional Design */}
         {showNewDriverForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-              <div className="bg-orange-500 text-white px-6 py-4 rounded-t-lg">
-                <h2 className="text-xl font-bold">
-                  {editingDriver ? 'Edit Driver' : 'Add New Driver'}
-                </h2>
+          <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full transform animate-slideUp">
+              <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-t-xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 transform -skew-x-12 animate-shimmer"></div>
+                <div className="relative z-10 flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">
+                      {editingDriver ? '🌟 Update Your Hero' : '🎉 Welcome New Hero'}
+                    </h2>
+                    <p className="text-orange-100 text-sm">
+                      {editingDriver ? 'Keep your team info fresh and accurate' : 'Add another amazing member to your delivery family!'}
+                    </p>
+                  </div>
+                </div>
               </div>
               
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-6 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Driver Name *
@@ -588,19 +641,19 @@ export default function DriversPage() {
                   />
                 </div>
                 
-                <div className="flex space-x-4 pt-4">
+                <div className="flex space-x-4 pt-6 border-t border-gray-100">
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                   >
-                    {editingDriver ? 'Update Driver' : 'Add Driver'}
+                    <span>{editingDriver ? '🚀 Update Hero' : '🎉 Welcome Hero'}</span>
                   </button>
                 </div>
               </form>

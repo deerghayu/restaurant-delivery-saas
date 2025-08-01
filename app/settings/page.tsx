@@ -24,8 +24,15 @@ import {
   Globe,
   CreditCard,
   Users,
-  Shield
+  Shield,
+  Star,
+  Award,
+  Heart,
+  Zap,
+  TrendingUp,
+  Sparkles
 } from 'lucide-react';
+import DelightfulLoading from '@/components/DelightfulLoading';
 import Link from 'next/link';
 
 const australianStates = [
@@ -88,6 +95,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [celebrateCompletion, setCelebrateCompletion] = useState(false);
+  const [profileCompleteness, setProfileCompleteness] = useState(0);
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -120,10 +129,28 @@ export default function SettingsPage() {
     is_active: true
   });
 
+  // Calculate profile completeness
+  const calculateCompleteness = (data: any) => {
+    const requiredFields = [
+      'name', 'email', 'phone', 'street_address', 'suburb', 'state', 'postcode',
+      'average_prep_time', 'delivery_radius', 'minimum_order', 'delivery_fee'
+    ];
+    
+    const completed = requiredFields.filter(field => {
+      const value = data[field];
+      return value !== null && value !== undefined && value !== '';
+    }).length;
+    
+    const bonusFields = ['logo_url', 'primary_color'];
+    const bonusCompleted = bonusFields.filter(field => data[field] && data[field] !== '').length;
+    
+    return Math.round(((completed / requiredFields.length) * 85) + ((bonusCompleted / bonusFields.length) * 15));
+  };
+
   // Load restaurant data
   useEffect(() => {
     if (restaurant) {
-      setFormData({
+      const newFormData = {
         name: restaurant.name || '',
         email: restaurant.email || '',
         phone: restaurant.phone || '',
@@ -142,7 +169,17 @@ export default function SettingsPage() {
         subscription_status: restaurant.subscription_status || 'active',
         trial_ends_at: restaurant.trial_ends_at || '',
         is_active: restaurant.is_active ?? true
-      });
+      };
+      
+      setFormData(newFormData);
+      const completeness = calculateCompleteness(newFormData);
+      setProfileCompleteness(completeness);
+      
+      // Celebrate when profile reaches high completeness
+      if (completeness >= 90 && completeness > profileCompleteness) {
+        setCelebrateCompletion(true);
+        setTimeout(() => setCelebrateCompletion(false), 4000);
+      }
     }
   }, [restaurant]);
 
@@ -155,8 +192,17 @@ export default function SettingsPage() {
   }, [message]);
 
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const newFormData = { ...formData, [field]: value };
+    setFormData(newFormData);
     setHasChanges(true);
+    
+    // Update completeness in real-time
+    const newCompleteness = calculateCompleteness(newFormData);
+    if (newCompleteness > profileCompleteness && newCompleteness >= 90) {
+      setCelebrateCompletion(true);
+      setTimeout(() => setCelebrateCompletion(false), 4000);
+    }
+    setProfileCompleteness(newCompleteness);
   };
 
   const updateBusinessHours = (day: string, field: string, value: any) => {
@@ -799,7 +845,11 @@ export default function SettingsPage() {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          <DelightfulLoading 
+            message="Loading your restaurant settings..."
+            submessage="Getting everything ready for you to customize!"
+            size="lg"
+          />
         </div>
       </ProtectedRoute>
     );
@@ -809,57 +859,161 @@ export default function SettingsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
         <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/dashboard" 
-                className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
-                  <SettingsIcon className="w-8 h-8 text-orange-500" />
-                  <span>Restaurant Settings</span>
-                </h1>
-                <p className="text-gray-600">Manage your restaurant profile and preferences</p>
+          {/* Profile Completion Celebration */}
+          {celebrateCompletion && (
+            <div className="mb-6 animate-slideUp">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-xl shadow-lg animate-celebration relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 transform -skew-x-12 animate-shimmer"></div>
+                <div className="flex items-center space-x-4 relative z-10">
+                  <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center animate-bounce">
+                    <Award size={32} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold mb-2 flex items-center space-x-2">
+                      <span>🎉 Outstanding Progress!</span>
+                      <Sparkles size={24} className="animate-pulse" />
+                    </h3>
+                    <p className="text-purple-100 font-medium text-lg">
+                      Your restaurant profile is {profileCompleteness}% complete! You're building something amazing! 
+                    </p>
+                  </div>
+                  <div className="text-6xl animate-gentle-bounce">🌟</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Enhanced Header with Progress */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-4">
+                <Link 
+                  href="/dashboard" 
+                  className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                >
+                  <ArrowLeft className="w-6 h-6 text-gray-600" />
+                </Link>
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900 flex items-center space-x-3">
+                    <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <SettingsIcon className="w-8 h-8 text-white" />
+                    </div>
+                    <span>Your Restaurant Journey</span>
+                  </h1>
+                  <p className="text-gray-600 text-lg mt-2">Crafting the perfect experience for your customers ✨</p>
+                </div>
+              </div>
+              
+              {/* Profile Completeness Indicator */}
+              <div className="text-right">
+                <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                      <TrendingUp size={16} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Profile Strength</p>
+                      <p className="text-2xl font-bold text-gray-900">{profileCompleteness}%</p>
+                    </div>
+                  </div>
+                  <div className="w-32 bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        profileCompleteness >= 90 ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+                        profileCompleteness >= 70 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                        profileCompleteness >= 50 ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
+                        'bg-gradient-to-r from-red-500 to-red-600'
+                      }`}
+                      style={{ width: `${profileCompleteness}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {profileCompleteness >= 90 ? 'Exceptional! 🌟' :
+                     profileCompleteness >= 70 ? 'Looking great! 👍' :
+                     profileCompleteness >= 50 ? 'Good progress! 📈' :
+                     'Let\'s build this! 🚀'}
+                  </p>
+                </div>
               </div>
             </div>
             
-            {hasChanges && (
+            {/* Encouraging Progress Message */}
+            {profileCompleteness < 100 && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-center space-x-3">
+                  <Heart size={20} className="text-blue-500 animate-heartbeat" />
+                  <div>
+                    <p className="font-medium text-blue-900">
+                      {profileCompleteness >= 90 ? 'Almost there! Your restaurant profile is nearly perfect!' :
+                       profileCompleteness >= 70 ? 'You\'re doing amazing! Just a few more details to make it shine!' :
+                       profileCompleteness >= 50 ? 'Great momentum! Keep adding those important details!' :
+                       'Every great restaurant starts here! Let\'s build your perfect profile together!'}
+                    </p>
+                    <p className="text-blue-700 text-sm mt-1">
+                      Complete profiles get more customer trust and better search visibility! 📈
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Enhanced Save Button */}
+          {hasChanges && (
+            <div className="fixed bottom-8 right-8 z-50">
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="btn-primary flex items-center space-x-2 disabled:opacity-50"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-full font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 disabled:opacity-50 animate-gentle-bounce"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Saving...</span>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span className="text-lg">Saving Your Magic...</span>
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    <Save size={20} />
+                    <span className="text-lg">💾 Save My Progress</span>
+                    <Zap size={20} className="animate-pulse" />
                   </>
                 )}
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Message */}
+          {/* Enhanced Message with Celebration */}
           {message && (
-            <div className={`mb-6 p-4 rounded-lg flex items-center space-x-2 ${
-              message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-            }`}>
-              {message.type === 'success' ? 
-                <CheckCircle className="w-5 h-5 text-green-500" /> : 
-                <AlertCircle className="w-5 h-5 text-red-500" />
-              }
-              <p className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
-                {message.text}
-              </p>
+            <div className={`mb-6 animate-slideUp ${
+              message.type === 'success' ? 
+                'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg animate-celebration' : 
+                'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
+            } rounded-xl p-6`}>
+              <div className="flex items-center space-x-4">
+                <div className={`w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center ${
+                  message.type === 'success' ? 'animate-bounce' : ''
+                }`}>
+                  {message.type === 'success' ? 
+                    <CheckCircle size={24} className="text-white" /> : 
+                    <AlertCircle size={24} className="text-white" />
+                  }
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-1">
+                    {message.type === 'success' ? '🎉 Amazing Work!' : '⚠️ Hold On!'}
+                  </h3>
+                  <p className={`font-medium ${
+                    message.type === 'success' ? 'text-green-100' : 'text-red-100'
+                  }`}>
+                    {message.type === 'success' ? 
+                      `${message.text} Your restaurant is getting better every day! 🌟` : 
+                      message.text}
+                  </p>
+                </div>
+                {message.type === 'success' && (
+                  <div className="text-4xl animate-gentle-bounce">⭐</div>
+                )}
+              </div>
             </div>
           )}
 
