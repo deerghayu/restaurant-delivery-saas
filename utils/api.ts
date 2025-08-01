@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { User } from '@supabase/supabase-js';
 
 /**
@@ -129,7 +129,7 @@ export const withApiAuth = async (
   user: User | null;
   authorized: boolean;
   error: string | null;
-  serviceSupabase: ReturnType<typeof createClient>;
+  serviceSupabase: SupabaseClient<any, "public", any>;
 }> => {
   const { serviceSupabase } = createApiSupabaseClients();
 
