@@ -18,6 +18,7 @@ export interface Restaurant {
   // Branding & Customization
   logo_url: string | null;
   primary_color: string;
+  menu_items: any | null; // JSONB
   business_hours: any | null; // JSONB
   
   // Business Settings

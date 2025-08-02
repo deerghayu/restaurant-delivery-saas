@@ -1,6 +1,7 @@
 export { default as SettingsTabNavigation, settingsTabs } from './SettingsTabNavigation';
 export { default as ProfileTab } from './ProfileTab';
 export { default as BrandingTab } from './BrandingTab';
+export { default as MenuTab } from './MenuTab';
 export { default as OperationsTab } from './OperationsTab';
 export { default as DeliveryTab } from './DeliveryTab';
 export { default as SubscriptionTab } from './SubscriptionTab';

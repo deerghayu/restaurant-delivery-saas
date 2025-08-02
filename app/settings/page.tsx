@@ -15,6 +15,7 @@ import {
   SettingsTabNavigation,
   ProfileTab,
   BrandingTab,
+  MenuTab,
   OperationsTab,
   DeliveryTab,
   SubscriptionTab,
@@ -55,6 +56,9 @@ export default function SettingsPage() {
     // Branding
     logo_url: '',
     primary_color: '#ea580c',
+    
+    // Menu
+    menu_items: [],
     
     // Operations
     business_hours: businessHoursTemplate,
@@ -103,6 +107,7 @@ export default function SettingsPage() {
         postcode: restaurant.postcode || '',
         logo_url: restaurant.logo_url || '',
         primary_color: restaurant.primary_color || '#ea580c',
+        menu_items: restaurant.menu_items || [],
         business_hours: restaurant.business_hours || businessHoursTemplate,
         average_prep_time: restaurant.average_prep_time || 15,
         delivery_radius: restaurant.delivery_radius || 10,
@@ -181,6 +186,7 @@ export default function SettingsPage() {
           postcode: formData.postcode,
           logo_url: formData.logo_url || null,
           primary_color: formData.primary_color,
+          menu_items: formData.menu_items,
           business_hours: formData.business_hours,
           average_prep_time: formData.average_prep_time,
           delivery_radius: formData.delivery_radius,
@@ -298,6 +304,12 @@ export default function SettingsPage() {
                 )}
                 {activeTab === 'branding' && (
                   <BrandingTab 
+                    formData={formData} 
+                    updateFormData={updateFormData} 
+                  />
+                )}
+                {activeTab === 'menu' && (
+                  <MenuTab 
                     formData={formData} 
                     updateFormData={updateFormData} 
                   />

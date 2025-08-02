@@ -3,7 +3,8 @@ import {
   Palette, 
   Settings as SettingsIcon, 
   DollarSign, 
-  Crown 
+  Crown,
+  UtensilsCrossed
 } from 'lucide-react';
 
 export const settingsTabs = [
@@ -18,6 +19,12 @@ export const settingsTabs = [
     name: 'Branding & Theme',
     icon: Palette,
     description: 'Logo, colors, and visual identity'
+  },
+  {
+    id: 'menu',
+    name: 'Menu Management',
+    icon: UtensilsCrossed,
+    description: 'Manage your menu items and categories'
   },
   {
     id: 'operations',

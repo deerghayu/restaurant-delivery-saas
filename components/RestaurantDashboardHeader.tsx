@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Bell, Plus, Users, Clock, TrendingUp, MapPin, LogOut, User, Settings } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ const RestaurantDashboardHeader = ({
   const [mounted, setMounted] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [internalShowModal, setInternalShowModal] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   
   // Use external state if provided, otherwise use internal state
   const showNewOrderModal = externalShowModal !== undefined ? externalShowModal : internalShowModal;
@@ -41,6 +42,18 @@ const RestaurantDashboardHeader = ({
       setCurrentTime(new Date());
     }, 60000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Enhanced emotional messaging based on performance and context
@@ -189,7 +202,7 @@ const RestaurantDashboardHeader = ({
               </div>
 
               {/* User Menu */}
-              <div className="relative z-[99999]">
+              <div className="relative z-[99999]" ref={userMenuRef}>
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-lg"

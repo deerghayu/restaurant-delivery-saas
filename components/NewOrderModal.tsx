@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Plus, Minus, DollarSign, User, MapPin, Phone, FileText, ShoppingCart, Search, ChevronDown } from 'lucide-react';
+import { X, Plus, Minus, DollarSign, User, MapPin, Phone, FileText, UtensilsCrossed, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -37,8 +37,9 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     { name: '', quantity: 1, price: 0 }
   ]);
 
-  // Restaurant menu items (in real app, this would come from database)
-  const menuItems: MenuItem[] = [
+  // Get menu items from restaurant data, fallback to sample items if none configured
+  const restaurantMenuItems = restaurant?.menu_items || [];
+  const defaultMenuItems: MenuItem[] = [
     // Pizzas
     { id: '1', name: 'Margherita Pizza', price: 18.90, category: 'Pizza' },
     { id: '2', name: 'Pepperoni Pizza', price: 21.90, category: 'Pizza' },
@@ -67,6 +68,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     { id: '21', name: 'Tiramisu', price: 8.90, category: 'Desserts' },
     { id: '22', name: 'Gelato (2 scoops)', price: 6.90, category: 'Desserts' }
   ];
+  
+  const menuItems: MenuItem[] = restaurantMenuItems.length > 0 ? restaurantMenuItems : defaultMenuItems;
 
   const [searchTerms, setSearchTerms] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
@@ -101,8 +104,10 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
   };
 
   const selectMenuItem = (menuItem: MenuItem, index: number) => {
-    updateItem(index, 'name', menuItem.name);
-    updateItem(index, 'price', menuItem.price);
+    const updatedItems = items.map((item, i) => 
+      i === index ? { ...item, name: menuItem.name, price: menuItem.price } : item
+    );
+    setItems(updatedItems);
     setDropdownOpen(null);
     // Clear search term for this item
     const newSearchTerms = [...searchTerms];
@@ -273,7 +278,7 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
         <div className="bg-orange-500 text-white px-6 py-4 rounded-t-xl flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <ShoppingCart className="w-6 h-6 text-white" />
+              <UtensilsCrossed className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">New Order</h2>
@@ -378,9 +383,8 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                   {items.map((item, index) => (
                     <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                       {/* Header with remove button */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-gray-600">#{index + 1}</span>
-                        {items.length > 1 && (
+                      {items.length > 1 && (
+                        <div className="flex justify-end mb-3">
                           <button
                             type="button"
                             onClick={() => removeItem(index)}
@@ -389,13 +393,13 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                           >
                             <X size={14} />
                           </button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                       
                       {/* Menu Item Selector */}
                       <div className="mb-3 relative" ref={dropdownRef}>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Menu Item *
+                          Menu Item #{index + 1}*
                         </label>
                         <div className="relative">
                           <input
@@ -417,8 +421,10 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                               <button
                                 type="button"
                                 onClick={() => {
-                                  updateItem(index, 'name', '');
-                                  updateItem(index, 'price', 0);
+                                  const updatedItems = items.map((item, i) => 
+                                    i === index ? { ...item, name: '', price: 0 } : item
+                                  );
+                                  setItems(updatedItems);
                                   updateSearchTerm(index, '');
                                 }}
                                 className="text-gray-400 hover:text-gray-600 p-0.5"
@@ -428,7 +434,7 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                               </button>
                             )}
                             {!item.name && (
-                              <Search size={16} className="text-gray-400" />
+                              <Search size={18} className="text-gray-400" />
                             )}
                           </div>
                           
@@ -464,14 +470,14 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">
-                            Qty
+                            Quantity
                           </label>
                           <input
                             type="number"
                             min="1"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                            className="w-full px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white text-sm"
+                            className="w-full px-2 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white text-sm [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto"
                             required
                           />
                         </div>
