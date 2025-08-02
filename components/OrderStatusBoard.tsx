@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Clock, 
   User, 
@@ -16,7 +16,10 @@ import {
   Zap,
   Coffee,
   Award,
-  Plus
+  Plus,
+  Search,
+  ChevronDown,
+  X
 } from 'lucide-react';
 import DelightfulLoading from './DelightfulLoading';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +29,117 @@ interface OrderStatusBoardProps {
   newOrder?: any | null;
   onNewOrderClick?: () => void;
 }
+
+interface DriverSelectorProps {
+  orderId: string;
+  availableDrivers: any[];
+  onAssignDriver: (orderId: string, driverId: string) => void;
+}
+
+const DriverSelector = ({ orderId, availableDrivers, onAssignDriver }: DriverSelectorProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDriver, setSelectedDriver] = useState<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filterDrivers = (searchTerm: string) => {
+    if (!searchTerm) return availableDrivers;
+    return availableDrivers.filter(driver => 
+      driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      driver.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (driver.vehicle_type && driver.vehicle_type.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  };
+
+  const selectDriver = (driver: any) => {
+    setSelectedDriver(driver);
+    setDropdownOpen(false);
+    setSearchTerm('');
+    onAssignDriver(orderId, driver.id);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Assign driver:</label>
+      <div className="relative" ref={dropdownRef}>
+        <input
+          type="text"
+          value={selectedDriver ? `${selectedDriver.name} • ${selectedDriver.phone}` : searchTerm}
+          onChange={(e) => {
+            if (!selectedDriver) {
+              setSearchTerm(e.target.value);
+              setDropdownOpen(true);
+            }
+          }}
+          onFocus={() => !selectedDriver && setDropdownOpen(true)}
+          className="w-full pl-4 pr-8 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 shadow-sm hover:border-gray-400 transition-all"
+          placeholder={selectedDriver ? selectedDriver.name : "Search drivers..."}
+          readOnly={!!selectedDriver}
+        />
+        <div className="absolute right-2 top-3 flex items-center space-x-1">
+          {selectedDriver && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDriver(null);
+                setSearchTerm('');
+                setDropdownOpen(true);
+              }}
+              className="text-gray-400 hover:text-gray-600 p-0.5"
+              title="Clear selection"
+            >
+              <X size={14} />
+            </button>
+          )}
+          {!selectedDriver && (
+            <Search size={16} className="text-gray-400" />
+          )}
+        </div>
+        
+        {/* Dropdown */}
+        {dropdownOpen && !selectedDriver && (
+          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            {filterDrivers(searchTerm).length === 0 ? (
+              <div className="px-3 py-2 text-gray-500 text-sm">No drivers found</div>
+            ) : (
+              filterDrivers(searchTerm).map((driver) => (
+                <button
+                  key={driver.id}
+                  type="button"
+                  onClick={() => selectDriver(driver)}
+                  className="w-full text-left px-3 py-2 hover:bg-orange-50 border-b border-gray-100 last:border-b-0 focus:bg-orange-50 focus:outline-none"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium text-gray-900">{driver.name}</div>
+                      <div className="text-xs text-gray-500">{driver.phone}</div>
+                    </div>
+                    <div className="text-xs text-blue-600">{driver.vehicle_type || 'Car'}</div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+      {availableDrivers.length === 0 && (
+        <p className="text-xs text-gray-500 mt-1">No available drivers</p>
+      )}
+    </div>
+  );
+};
 
 const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) => {
   const { restaurant } = useAuth();
@@ -39,14 +153,30 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
     assigned: [] as any[],
     outForDelivery: [] as any[]
   });
+  const [availableDrivers, setAvailableDrivers] = useState<any[]>([]);
 
-  // Available drivers for assignment
-  const availableDrivers = [
-    { id: 'emma', name: 'Emma', avatar: '👩', phone: '0445 123 456', status: 'available' },
-    { id: 'james', name: 'James', avatar: '👨', phone: '0467 234 567', status: 'busy' },
-    { id: 'sophie', name: 'Sophie', avatar: '👩', phone: '0489 345 678', status: 'busy' },
-    { id: 'alex', name: 'Alex', avatar: '👨', phone: '0491 567 890', status: 'available' }
-  ];
+  // Fetch drivers from Supabase
+  const fetchDrivers = async () => {
+    if (!restaurant) return;
+
+    try {
+      const { data: driversData, error } = await supabase
+        .from('drivers')
+        .select('*')
+        .eq('restaurant_id', restaurant.id)
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching drivers:', error);
+        return;
+      }
+
+      setAvailableDrivers(driversData || []);
+    } catch (error) {
+      console.error('Error in fetchDrivers:', error);
+    }
+  };
 
   // Fetch orders from Supabase
   const fetchOrders = async () => {
@@ -92,17 +222,19 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
         if (order.status === 'pending') {
           transformedOrders.pending.push(transformedOrder);
         } else if (order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready') {
+          const assignedDriver = availableDrivers.find(d => d.id === order.driver_id);
           transformedOrders.assigned.push({
             ...transformedOrder,
-            driver: { name: 'Emma', phone: '0445 123 456', avatar: '👩' },
+            driver: assignedDriver ? { name: assignedDriver.name, phone: assignedDriver.phone, id: assignedDriver.id } : null,
             status: order.status,
             estimatedPickup: new Date(Date.now() + 10 * 60000),
             estimatedDelivery: new Date(Date.now() + 25 * 60000)
           });
         } else if (order.status === 'picked_up' || order.status === 'out_for_delivery') {
+          const assignedDriver = availableDrivers.find(d => d.id === order.driver_id);
           transformedOrders.outForDelivery.push({
             ...transformedOrder,
-            driver: { name: 'James', phone: '0467 234 567', avatar: '👨' },
+            driver: assignedDriver ? { name: assignedDriver.name, phone: assignedDriver.phone, id: assignedDriver.id } : null,
             status: order.status,
             estimatedDelivery: new Date(Date.now() + 15 * 60000),
             actualPickupTime: order.picked_up_at ? new Date(order.picked_up_at) : new Date(Date.now() - 10 * 60000)
@@ -130,6 +262,7 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
   useEffect(() => {
     if (restaurant) {
       fetchOrders();
+      fetchDrivers();
 
       // Set up realtime subscription for order updates
       const subscription = supabase
@@ -280,6 +413,7 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
       const { error } = await supabase
         .from('orders')
         .update({ 
+          driver_id: driverId,
           status: 'confirmed',
           assigned_at: new Date().toISOString(),
           confirmed_at: new Date().toISOString(),
@@ -426,32 +560,11 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
                   Cancel
                 </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Assign driver:</label>
-                <div className="relative">
-                  <select 
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        assignDriver(order.id, e.target.value);
-                      }
-                    }}
-                    defaultValue=""
-                    className="w-full pl-4 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:border-gray-300 transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="" disabled className="text-gray-400">👤 Select a driver</option>
-                    {availableDrivers.filter(d => d.status === 'available').map(driver => (
-                      <option key={driver.id} value={driver.id} className="text-gray-700">
-                        {driver.avatar} {driver.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
+              <DriverSelector 
+                orderId={order.id} 
+                availableDrivers={availableDrivers.filter(d => d.status === 'available')} 
+                onAssignDriver={assignDriver}
+              />
             </div>
           </div>
         )}
@@ -460,10 +573,14 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
           <div className="p-4">
             <div className="flex items-center space-x-2 mb-3">
               <Car size={16} className="text-orange-500" />
-              <span className="font-semibold text-gray-800 text-base">Driver: {order.driver.name}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded" title="Call driver">
-                <Phone size={14} className="text-green-500" />
-              </button>
+              <span className="font-semibold text-gray-800 text-base">
+                Driver: {order.driver ? order.driver.name : 'Not assigned'}
+              </span>
+              {order.driver && (
+                <button className="ml-auto p-1 hover:bg-gray-100 rounded" title="Call driver">
+                  <Phone size={14} className="text-green-500" />
+                </button>
+              )}
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -504,10 +621,14 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
           <div className="p-4">
             <div className="flex items-center space-x-2 mb-3">
               <Navigation size={16} className="text-green-500" />
-              <span className="font-semibold text-gray-800 text-base">En route: {order.driver.name}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded" title="Call driver">
-                <Phone size={14} className="text-green-500" />
-              </button>
+              <span className="font-semibold text-gray-800 text-base">
+                En route: {order.driver ? order.driver.name : 'Driver not assigned'}
+              </span>
+              {order.driver && (
+                <button className="ml-auto p-1 hover:bg-gray-100 rounded" title="Call driver">
+                  <Phone size={14} className="text-green-500" />
+                </button>
+              )}
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">

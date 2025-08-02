@@ -174,6 +174,12 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
         return;
       }
 
+      if (customerPhone.length !== 10 || !/^\d{10}$/.test(customerPhone)) {
+        setError('Phone number must be exactly 10 digits');
+        setLoading(false);
+        return;
+      }
+
       const validItems = items.filter(item => item.name.trim() && item.price > 0);
       if (validItems.length === 0) {
         setError('Please add at least one item');
@@ -329,11 +335,24 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                   <input
                     type="tel"
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    placeholder="0412 345 678"
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+                      if (value.length <= 10) {
+                        setCustomerPhone(value);
+                      }
+                    }}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400 ${
+                      customerPhone && customerPhone.length !== 10 
+                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="0412345678"
+                    maxLength={10}
                     required
                   />
+                  {customerPhone && customerPhone.length !== 10 && (
+                    <p className="text-red-600 text-xs mt-1">Phone number must be exactly 10 digits</p>
+                  )}
                 </div>
 
                 <div>
