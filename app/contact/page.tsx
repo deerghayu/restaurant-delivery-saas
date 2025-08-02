@@ -1,45 +1,212 @@
 import { Metadata } from 'next';
+import PageLayout from '@/components/PageLayout';
+import { Mail, MessageCircle, MapPin, Clock, Phone } from 'lucide-react';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Contact ZoomDishes',
-  description: 'Get in touch with the ZoomDishes team.',
+  title: 'Contact ZoomDishes - Get Support & Talk to Our Australian Team',
+  description: 'Get in touch with the ZoomDishes team. We provide local Australian support for restaurant owners using our delivery management platform.',
+  openGraph: {
+    title: 'Contact ZoomDishes - Get Support & Talk to Our Australian Team',
+    description: 'Get in touch with the ZoomDishes team. We provide local Australian support for restaurant owners using our delivery management platform.',
+  },
 };
+
+const contactMethods = [
+  {
+    icon: <Mail className="w-8 h-8 text-orange-500" />,
+    title: 'General Inquiries',
+    description: 'Questions about ZoomDishes or want to learn more?',
+    contact: 'hello@zoomdishes.com',
+    href: 'mailto:hello@zoomdishes.com',
+  },
+  {
+    icon: <MessageCircle className="w-8 h-8 text-blue-500" />,
+    title: 'Customer Support',
+    description: 'Need help with your account or technical issues?',
+    contact: 'support@zoomdishes.com',
+    href: 'mailto:support@zoomdishes.com',
+  },
+  {
+    icon: <Phone className="w-8 h-8 text-green-500" />,
+    title: 'Sales & Partnerships',
+    description: 'Interested in partnerships or have sales questions?',
+    contact: 'sales@zoomdishes.com',
+    href: 'mailto:sales@zoomdishes.com',
+  },
+];
+
+const officeInfo = [
+  {
+    icon: <MapPin className="w-6 h-6 text-orange-500" />,
+    label: 'Address',
+    value: '123 Fake Street, Sydney, NSW 2000, Australia',
+  },
+  {
+    icon: <Clock className="w-6 h-6 text-blue-500" />,
+    label: 'Business Hours',
+    value: 'Monday - Friday: 9:00 AM - 6:00 PM AEST',
+  },
+  {
+    icon: <Phone className="w-6 h-6 text-green-500" />,
+    label: 'Phone',
+    value: '+61 2 9999 9999',
+  },
+];
 
 const ContactPage = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-      <p className="text-lg mb-4">
-        Have a question or need support? We're here to help.
-      </p>
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2">Email</h2>
-        <p className="text-lg">
-          For general inquiries, please email us at{' '}
-          <a href="mailto:hello@zoomdishes.com" className="text-orange-600 hover:underline">
-            hello@zoomdishes.com
-          </a>
-        </p>
-        <p className="text-lg">
-          For support, please email us at{' '}
-          <a href="mailto:support@zoomdishes.com" className="text-orange-600 hover:underline">
-            support@zoomdishes.com
-          </a>
-        </p>
-      </div>
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Address</h2>
-        <p className="text-lg">
-          ZoomDishes HQ
-          <br />
-          123 Fake Street
-          <br />
-          Sydney, NSW 2000
-          <br />
-          Australia
-        </p>
-      </div>
-    </div>
+    <PageLayout>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-orange-50 to-red-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+            Get in <span className="gradient-text">Touch</span>
+          </h1>
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            We're here to help Australian restaurants succeed. Our local team is ready to 
+            support you every step of the way.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Methods */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">How Can We Help?</h2>
+            <p className="text-xl text-gray-600">Choose the best way to reach our team</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {contactMethods.map((method, index) => (
+              <div key={index} className="bg-gray-50 rounded-xl p-8 text-center hover:bg-white hover:shadow-lg transition-all duration-300">
+                <div className="flex justify-center mb-6">
+                  {method.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{method.title}</h3>
+                <p className="text-gray-600 mb-6">{method.description}</p>
+                <a 
+                  href={method.href}
+                  className="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                >
+                  {method.contact}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Office Information */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-8">Visit Our Office</h2>
+              <div className="space-y-6">
+                {officeInfo.map((info, index) => (
+                  <div key={index} className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 mt-1">
+                      {info.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">{info.label}</h3>
+                      <p className="text-gray-600">{info.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-8 p-6 bg-orange-50 rounded-xl border border-orange-200">
+                <h3 className="font-bold text-orange-800 mb-2">🇦🇺 Local Australian Support</h3>
+                <p className="text-orange-700">
+                  Our entire team is based in Australia. We understand the local market, 
+                  regulations, and challenges that Australian restaurants face.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Contact Form</h3>
+              <form className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    Restaurant Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="Mario's Pizza"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="owner@mariopizza.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                    Subject
+                  </label>
+                  <select
+                    id="subject"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <option>General Inquiry</option>
+                    <option>Technical Support</option>
+                    <option>Sales Question</option>
+                    <option>Partnership Opportunity</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="Tell us how we can help..."
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Link Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Looking for Quick Answers?
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Check out our frequently asked questions for immediate help.
+          </p>
+          <Link 
+            href="/help" 
+            className="inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+          >
+            Visit Help Center
+          </Link>
+        </div>
+      </section>
+    </PageLayout>
   );
 };
 
