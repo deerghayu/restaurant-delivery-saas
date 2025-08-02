@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import PageLayout from '@/components/PageLayout';
 import { Mail, MessageCircle, MapPin, Clock, Phone } from 'lucide-react';
 import Link from 'next/link';
+import { Card, Button } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'Contact ZoomDishes - Get Support & Talk to Our Australian Team',
@@ -54,7 +55,7 @@ const officeInfo = [
   },
 ];
 
-const ContactPage = () => {
+function ContactPage() {
   return (
     <PageLayout>
       {/* Hero Section */}
@@ -86,11 +87,10 @@ const ContactPage = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{method.title}</h3>
                 <p className="text-gray-600 mb-6">{method.description}</p>
-                <a 
-                  href={method.href}
-                  className="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  {method.contact}
+                <a href={method.href}>
+                  <Button variant="primary" size="md" className="w-full">
+                    {method.contact}
+                  </Button>
                 </a>
               </div>
             ))}
@@ -127,7 +127,7 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-200">
+            <Card className="shadow-xl border-orange-200">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Contact Form</h3>
               <form className="space-y-4">
                 <div>
@@ -177,14 +177,16 @@ const ContactPage = () => {
                     placeholder="Tell us how we can help..."
                   ></textarea>
                 </div>
-                <button
+                <Button
                   type="submit"
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  variant="primary"
+                  size="md"
+                  className="w-full"
                 >
                   Send Message
-                </button>
+                </Button>
               </form>
-            </div>
+            </Card>
           </div>
         </div>
       </section>
@@ -198,16 +200,15 @@ const ContactPage = () => {
           <p className="text-xl text-gray-600 mb-8">
             Check out our frequently asked questions for immediate help.
           </p>
-          <Link 
-            href="/help" 
-            className="inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors"
-          >
-            Visit Help Center
+          <Link href="/help">
+            <Button variant="secondary" size="lg">
+              Visit Help Center
+            </Button>
           </Link>
         </div>
       </section>
     </PageLayout>
   );
-};
+}
 
 export default ContactPage;

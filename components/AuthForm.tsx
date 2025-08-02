@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Store, Mail, Lock } from 'lucide-react';
+import { FormField, StatusMessage, Button, Card } from '@/components/ui';
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
@@ -73,7 +74,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-xl p-8">
+      <Card shadow="xl" padding="xl">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <span className="text-3xl">🚚</span>
@@ -88,64 +89,59 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="mb-6">
+            <StatusMessage type="error">
+              {error}
+            </StatusMessage>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {mode === 'signup' && (
-            <div>
-              <label htmlFor="restaurantName" className="block text-sm font-medium text-gray-700 mb-2">
-                Restaurant Name
-              </label>
-              <input
-                id="restaurantName"
-                type="text"
-                value={restaurantName}
-                onChange={(e) => setRestaurantName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                placeholder="Mario's Pizza"
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-              placeholder="owner@mariopizza.com"
+            <FormField
+              label="Restaurant Name"
+              type="text"
+              value={restaurantName}
+              onChange={setRestaurantName}
+              placeholder="Mario's Pizza"
+              icon={Store}
+              iconColor="text-orange-500"
               required
             />
-          </div>
+          )}
+
+          <FormField
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            placeholder="owner@mariopizza.com"
+            icon={Mail}
+            iconColor="text-blue-500"
+            autoComplete="email"
+            required
+          />
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
             <div className="relative">
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
-                id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition-colors duration-200"
                 placeholder={mode === 'signup' ? 'At least 6 characters' : 'Enter your password'}
                 required
                 minLength={mode === 'signup' ? 6 : undefined}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -153,32 +149,29 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
           </div>
 
           {mode === 'signup' && (
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                placeholder="Confirm your password"
-                required
-              />
-            </div>
+            <FormField
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              placeholder="Confirm your password"
+              icon={Lock}
+              iconColor="text-gray-500"
+              autoComplete="new-password"
+              required
+            />
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            size="lg"
+            loading={loading}
+            loadingText={mode === 'login' ? 'Signing In...' : 'Creating Account...'}
+            fullWidth
           >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>
-              {loading ? (mode === 'login' ? 'Signing In...' : 'Creating Account...') : (mode === 'login' ? 'Sign In' : 'Create Account')}
-            </span>
-          </button>
+            {mode === 'login' ? 'Sign In' : 'Create Account'}
+          </Button>
         </form>
 
         <div className="mt-6 text-center">
@@ -199,7 +192,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
             14-day free trial, no credit card required.
           </p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

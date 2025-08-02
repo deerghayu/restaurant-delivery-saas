@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import DelightfulLoading from "@/components/DelightfulLoading";
 import {
   OrderHeader,
   StatusCard,
   OrderTimeline,
   OrderSummary,
-  LoadingState,
   ErrorState,
   OrderNotFoundState
 } from './tracking';
@@ -194,7 +194,14 @@ const CustomerTrackingPage = ({ orderId }: { orderId?: string }) => {
 
   // Loading state
   if (loading) {
-    return <LoadingState />;
+    return (
+      <DelightfulLoading 
+        type="delivering"
+        message="Loading order details..."
+        submessage="Getting the latest updates on your delivery"
+        size="lg"
+      />
+    );
   }
 
   // Error state

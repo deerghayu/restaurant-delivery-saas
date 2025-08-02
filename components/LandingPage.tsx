@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { Card, Button } from '@/components/ui';
 import {
   ArrowRight,
   Truck,
@@ -14,7 +15,6 @@ import {
   Zap,
   Heart,
 } from "lucide-react";
-import Head from 'next/head';
 
 const LandingPage = () => {
   const [email, setEmail] = useState("");
@@ -147,12 +147,6 @@ const LandingPage = () => {
 
   return (
     <main className="min-h-screen">
-      <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      </Head>
       {/* Navigation */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -168,11 +162,10 @@ const LandingPage = () => {
               >
                 Sign In
               </Link>
-              <Link 
-                href="/auth?mode=signup" 
-                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                Sign Up
+              <Link href="/auth?mode=signup">
+                <Button variant="primary" size="sm">
+                  Sign Up
+                </Button>
               </Link>
             </div>
           </div>
@@ -234,7 +227,7 @@ const LandingPage = () => {
             </div>
 
             <div className="animate-slide-up">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
+              <Card className="shadow-2xl border-orange-200 hover:border-orange-300 transition-colors duration-300">
                 <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-6 mb-6">
                   <div className="flex items-center justify-between text-white mb-4">
                     <h3 className="font-bold text-lg">Mario's Pizza</h3>
@@ -268,7 +261,7 @@ const LandingPage = () => {
                     <span className="text-orange-600 text-sm">2:40 PM</span>
                   </div>
                 </div>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
@@ -319,7 +312,7 @@ const LandingPage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-8 shadow-lg border border-orange-200 hover:border-orange-300 transition-colors duration-300">
+              <Card key={index} className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
                 <div className="flex items-center mb-4">
                   <span className="text-3xl mr-3">{testimonial.avatar}</span>
                   <div>
@@ -335,7 +328,7 @@ const LandingPage = () => {
                     <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

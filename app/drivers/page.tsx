@@ -7,6 +7,8 @@ import { Driver } from "@/types/database";
 import { getRestaurantId } from "@/utils/restaurant";
 import { VEHICLE_TYPES, APP_CONFIG, SUCCESS_MESSAGES, ERROR_MESSAGES } from "@/lib/constants";
 import DelightfulLoading from "@/components/DelightfulLoading";
+import DriverFormModal from "@/components/drivers/DriverFormModal";
+import { StatusMessage, Button } from '@/components/ui';
 import { 
   ArrowLeft, 
   Plus, 
@@ -35,6 +37,7 @@ export default function DriversPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [driverToDelete, setDriverToDelete] = useState<Driver | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
 
   // New driver form state
   const [formData, setFormData] = useState({
@@ -51,6 +54,11 @@ export default function DriversPage() {
   const getVehicleEmoji = (vehicleType: string) => {
     const vehicle = VEHICLE_TYPES.find(v => v.value === vehicleType);
     return vehicle?.emoji || '🚗';
+  };
+
+  // Handle form data changes for DriverFormModal
+  const handleFormDataChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   // Fetch drivers
@@ -115,10 +123,12 @@ export default function DriversPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormLoading(true);
     
     const restaurantId = getRestaurantId(restaurant);
     if (!restaurantId) {
       setMessage({ type: 'error', text: 'Restaurant ID not found. Please refresh and try again.' });
+      setFormLoading(false);
       return;
     }
 
@@ -189,6 +199,8 @@ export default function DriversPage() {
       fetchDrivers();
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -311,28 +323,25 @@ export default function DriversPage() {
                 <p className="text-gray-600 mt-1">Manage your delivery drivers and their performance</p>
               </div>
             </div>
-            <button
+            <Button
               onClick={() => setShowNewDriverForm(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 shadow-md hover:shadow-lg"
+              variant="primary"
+              size="md"
+              icon={Plus}
+              className="shadow-md hover:shadow-lg"
             >
-              <Plus className="w-5 h-5" />
-              <span>Add New Driver</span>
-            </button>
+              Add New Driver
+            </Button>
           </div>
 
           {/* Message */}
           {message && (
-            <div className={`mb-6 p-4 rounded-lg flex items-center space-x-2 ${
-              message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-            }`}>
-              {message.type === 'success' ? 
-                <CheckCircle className="w-5 h-5 text-green-500" /> : 
-                <AlertCircle className="w-5 h-5 text-red-500" />
-              }
-              <p className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
-                {message.text}
-              </p>
-            </div>
+            <StatusMessage 
+              type={message.type} 
+              className="mb-6"
+            >
+              {message.text}
+            </StatusMessage>
           )}
 
           {/* Driver Stats */}
@@ -406,12 +415,14 @@ export default function DriversPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">No drivers yet</h3>
                 <p className="text-gray-600 mb-6 max-w-sm mx-auto">Add your first driver to start managing deliveries and grow your delivery operations</p>
-                <button
+                <Button
                   onClick={() => setShowNewDriverForm(true)}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
+                  variant="primary"
+                  size="md"
+                  className="shadow-md"
                 >
                   Add Your First Driver
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
@@ -480,33 +491,38 @@ export default function DriversPage() {
                         
                         {/* Actions */}
                         <div className="flex items-center space-x-2">
-                          <button
+                          <Button
                             onClick={() => toggleDriverStatus(driver)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              driver.status === 'available' 
-                                ? 'bg-gray-100 hover:bg-gray-200 text-gray-600' 
-                                : 'bg-green-100 hover:bg-green-200 text-green-600'
-                            }`}
+                            variant={driver.status === 'available' ? 'ghost' : 'success'}
+                            size="sm"
+                            icon={driver.status === 'available' ? EyeOff : Eye}
                             title={driver.status === 'available' ? 'Set offline' : 'Set available'}
+                            className="p-2"
                           >
-                            {driver.status === 'available' ? <EyeOff size={16} /> : <Eye size={16} />}
-                          </button>
+                            {driver.status === 'available' ? 'Set offline' : 'Set available'}
+                          </Button>
                           
-                          <button
+                          <Button
                             onClick={() => handleEdit(driver)}
-                            className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors"
+                            variant="ghost"
+                            size="sm"
+                            icon={Edit3}
                             title="Edit driver"
+                            className="p-2 text-blue-600 hover:bg-blue-100"
                           >
-                            <Edit3 size={16} />
-                          </button>
+                            Edit
+                          </Button>
                           
-                          <button
+                          <Button
                             onClick={() => handleDeleteClick(driver)}
-                            className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+                            variant="ghost"
+                            size="sm"
+                            icon={Trash2}
                             title="Remove driver"
+                            className="p-2 text-red-600 hover:bg-red-100"
                           >
-                            <Trash2 size={16} />
-                          </button>
+                            Delete
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -518,122 +534,15 @@ export default function DriversPage() {
         </div>
 
         {/* New/Edit Driver Modal */}
-        {showNewDriverForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-              <div className="bg-orange-500 text-white px-6 py-4 rounded-t-xl">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">
-                      {editingDriver ? 'Update Driver' : 'Add New Driver'}
-                    </h2>
-                    <p className="text-orange-100 text-sm">
-                      {editingDriver ? 'Update driver information' : 'Add a new team member'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Driver Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
-                    placeholder="John Smith"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
-                    placeholder="0412 345 678"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
-                    placeholder="john@example.com"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vehicle Type
-                  </label>
-                  <select
-                    value={formData.vehicle_type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, vehicle_type: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
-                    style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
-                  >
-                    {VEHICLE_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.emoji} {type.label}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-sm text-gray-500 mt-1">Avatar will be automatically assigned based on vehicle type</p>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    License Plate
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.license_plate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, license_plate: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
-                    placeholder="ABC123"
-                  />
-                </div>
-                
-                <div className="flex space-x-4 pt-6 border-t border-gray-100">
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <span>{editingDriver ? 'Update Driver' : 'Add Driver'}</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <DriverFormModal
+          isOpen={showNewDriverForm}
+          editingDriver={editingDriver}
+          formData={formData}
+          onFormDataChange={handleFormDataChange}
+          onSubmit={handleSubmit}
+          onClose={resetForm}
+          loading={formLoading}
+        />
 
         {/* Delete Driver Confirmation Modal */}
         {showDeleteModal && driverToDelete && (
@@ -667,35 +576,36 @@ export default function DriversPage() {
                   </div>
                 </div>
                 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-start space-x-3">
-                    <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-red-800 font-medium text-sm">Are you sure you want to remove this driver?</p>
-                      <p className="text-red-700 text-sm mt-1">
-                        This will permanently remove <strong>{driverToDelete.name}</strong> from your delivery team. 
-                        All their delivery history will be preserved, but they won't be able to receive new orders.
-                      </p>
-                    </div>
+                <StatusMessage type="warning" className="mb-6">
+                  <div>
+                    <p className="font-medium text-sm">Are you sure you want to remove this driver?</p>
+                    <p className="text-sm mt-1">
+                      This will permanently remove <strong>{driverToDelete.name}</strong> from your delivery team. 
+                      All their delivery history will be preserved, but they won't be able to receive new orders.
+                    </p>
                   </div>
-                </div>
+                </StatusMessage>
                 
                 <div className="flex space-x-4">
-                  <button
+                  <Button
                     type="button"
                     onClick={handleDeleteCancel}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                    variant="ghost"
+                    size="lg"
+                    className="flex-1"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={handleDeleteConfirm}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
+                    variant="danger"
+                    size="lg"
+                    icon={Trash2}
+                    className="flex-1"
                   >
-                    <Trash2 size={16} />
-                    <span>Remove Driver</span>
-                  </button>
+                    Remove Driver
+                  </Button>
                 </div>
               </div>
             </div>

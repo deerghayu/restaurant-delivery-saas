@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Plus, Minus, DollarSign, User, MapPin, Phone, FileText, UtensilsCrossed, Search, ChevronDown } from 'lucide-react';
+import { X, Plus, DollarSign, User, MapPin, Phone, FileText, UtensilsCrossed, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { BaseModal, FormField, StatusMessage, Button, SectionHeader, Card } from '@/components/ui';
 
 interface NewOrderModalProps {
   isOpen: boolean;
@@ -275,31 +276,17 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="bg-orange-500 text-white px-6 py-4 rounded-t-xl flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <UtensilsCrossed className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold">New Order</h2>
-              <p className="text-orange-100 text-sm">Create a new delivery order</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-orange-200 hover:text-white transition-colors p-1"
-            >
-              <X size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="New Order"
+      subtitle="Create a new delivery order"
+      icon={<UtensilsCrossed className="w-6 h-6 text-white" />}
+      maxWidth="6xl"
+      showCloseButton={false}
+    >
+      {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1">
           {/* Content with horizontal layout */}
           <div className="flex-1 p-6">
@@ -307,83 +294,74 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
               {/* Left Column - Customer Information */}
               <div className="space-y-4">
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 col-span-full">
-                    <p className="text-red-700 text-sm">{error}</p>
-                  </div>
+                  <StatusMessage type="error" className="col-span-full">
+                    {error}
+                  </StatusMessage>
                 )}
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h3>
+                <SectionHeader
+                  title="Customer Information"
+                  icon={User}
+                  variant="blue"
+                  className="mb-4"
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Customer Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    placeholder="John Smith"
-                    required
-                  />
-                </div>
+                <FormField
+                  label="Customer Name"
+                  type="text"
+                  value={customerName}
+                  onChange={setCustomerName}
+                  placeholder="John Smith"
+                  icon={User}
+                  iconColor="text-blue-500"
+                  required
+                />
+
+                <FormField
+                  label="Phone Number"
+                  type="tel"
+                  value={customerPhone}
+                  onChange={(value) => {
+                    const cleanValue = value.replace(/\D/g, '').slice(0, 10);
+                    setCustomerPhone(cleanValue);
+                  }}
+                  placeholder="0412345678"
+                  pattern="[0-9]{10}"
+                  maxLength={10}
+                  icon={Phone}
+                  iconColor="text-green-500"
+                  error={customerPhone && customerPhone.length !== 10 ? "Phone number must be exactly 10 digits" : undefined}
+                  helperText="Enter 10 digits only"
+                  required
+                />
+
+                <FormField
+                  label="Delivery Address"
+                  type="text"
+                  value={customerAddress}
+                  onChange={setCustomerAddress}
+                  placeholder="123 Main St, Melbourne VIC 3000"
+                  icon={MapPin}
+                  iconColor="text-red-500"
+                  required
+                />
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={customerPhone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
-                      if (value.length <= 10) {
-                        setCustomerPhone(value);
-                      }
-                    }}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400 ${
-                      customerPhone && customerPhone.length !== 10 
-                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    placeholder="0412345678"
-                    maxLength={10}
-                    required
-                  />
-                  {customerPhone && customerPhone.length !== 10 && (
-                    <p className="text-red-600 text-xs mt-1">Phone number must be exactly 10 digits</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Address *
-                  </label>
-                  <input
-                    type="text"
-                    value={customerAddress}
-                    onChange={(e) => setCustomerAddress(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
-                    placeholder="123 Main St, Melbourne VIC 3000"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="form-label">
+                    <FileText className="w-4 h-4 inline mr-1 text-purple-500" />
                     Special Instructions
                   </label>
                   <textarea
                     value={specialInstructions}
                     onChange={(e) => setSpecialInstructions(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white placeholder-gray-400"
+                    className="form-input"
                     placeholder="Extra cheese, no onions, call when arriving..."
                     rows={3}
                   />
                 </div>
 
                 {/* Order Total */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <Card className="bg-gray-50">
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold text-gray-900">Order Total:</span>
                     <span className="text-2xl font-bold text-green-600 flex items-center">
@@ -391,7 +369,7 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                       {calculateTotal().toFixed(2)}
                     </span>
                   </div>
-                </div>
+                </Card>
               </div>
 
               {/* Right Column - Order Items */}
@@ -400,18 +378,21 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                 
                 <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2">
                   {items.map((item, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <Card key={index} className="bg-gray-50 border-gray-200">
                       {/* Header with remove button */}
                       {items.length > 1 && (
                         <div className="flex justify-end mb-3">
-                          <button
+                          <Button
                             type="button"
                             onClick={() => removeItem(index)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                            variant="ghost"
+                            size="sm"
+                            icon={X}
                             title="Remove item"
+                            className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50"
                           >
-                            <X size={14} />
-                          </button>
+                            Remove
+                          </Button>
                         </div>
                       )}
                       
@@ -437,7 +418,7 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                           />
                           <div className="absolute right-2 top-2.5 flex items-center space-x-1">
                             {item.name && (
-                              <button
+                              <Button
                                 type="button"
                                 onClick={() => {
                                   const updatedItems = items.map((item, i) => 
@@ -446,11 +427,14 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                                   setItems(updatedItems);
                                   updateSearchTerm(index, '');
                                 }}
-                                className="text-gray-400 hover:text-gray-600 p-0.5"
+                                variant="ghost"
+                                size="sm"
+                                icon={X}
                                 title="Clear selection"
+                                className="text-gray-400 hover:text-gray-600 p-0.5"
                               >
-                                <X size={14} />
-                              </button>
+                                Clear
+                              </Button>
                             )}
                             {!item.name && (
                               <Search size={18} className="text-gray-400" />
@@ -529,17 +513,19 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
                           </span>
                         </div>
                       )}
-                    </div>
+                    </Card>
                   ))}
                   
-                  <button
+                  <Button
                     type="button"
                     onClick={addItem}
-                    className="w-full border-2 border-dashed border-orange-200 rounded-lg py-2 text-orange-600 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
+                    variant="ghost"
+                    size="md"
+                    icon={Plus}
+                    className="w-full border-2 border-dashed border-orange-200 text-orange-600 hover:border-orange-400 hover:bg-orange-50"
                   >
-                    <Plus size={16} />
-                    <span>Add Item</span>
-                  </button>
+                    Add Item
+                  </Button>
                 </div>
               </div>
             </div>
@@ -548,35 +534,40 @@ export default function NewOrderModal({ isOpen, onClose, onOrderCreated }: NewOr
           {/* Fixed Form Actions */}
           <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50">
             <div className="flex space-x-4">
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                variant="ghost"
+                size="lg"
+                className="flex-1"
                 disabled={loading}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={loading || calculateTotal() <= 0}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                variant="primary"
+                size="lg"
+                loading={loading}
+                icon={!loading ? Plus : undefined}
+                className="flex-1"
               >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Creating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Plus size={16} />
-                    <span>Create Order</span>
-                  </>
-                )}
-              </button>
+                {loading ? 'Creating...' : 'Create Order'}
+              </Button>
             </div>
           </div>
         </form>
-      </div>
-    </div>
-  );
+        {/* Custom close button since we disabled the default one */}
+        <Button
+          onClick={onClose}
+          variant="ghost"
+          size="sm"
+          icon={X}
+          className="absolute top-4 right-4 text-orange-200 hover:text-white p-1 z-10"
+        >
+          Close
+        </Button>
+      </BaseModal>
+    );
 }

@@ -1,4 +1,5 @@
 import { Phone, Star } from 'lucide-react';
+import { Button, Card } from '@/components/ui';
 
 interface OrderItem {
   name: string;
@@ -14,7 +15,7 @@ interface OrderSummaryProps {
 export default function OrderSummary({ items, total }: OrderSummaryProps) {
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
+      <Card className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Order Summary
         </h3>
@@ -40,23 +41,22 @@ export default function OrderSummary({ items, total }: OrderSummaryProps) {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Contact Card */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
+      <Card className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Need Help?
         </h3>
         <div className="space-y-3">
-          <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2">
-            <Phone className="w-5 h-5" />
-            <span>Call Restaurant</span>
-          </button>
-          <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg font-semibold transition-colors">
+          <Button variant="primary" size="md" icon={Phone} className="w-full">
+            Call Restaurant
+          </Button>
+          <Button variant="ghost" size="md" className="w-full">
             Report an Issue
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Rate Experience */}
       <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg p-6 text-white">

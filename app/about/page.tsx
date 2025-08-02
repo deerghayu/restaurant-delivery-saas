@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import PageLayout from '@/components/PageLayout';
 import { Users, Heart, Zap, Shield, MapPin, Star } from 'lucide-react';
 import Link from 'next/link';
+import { Card } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'About ZoomDishes - Australian Restaurant Delivery Platform',
@@ -106,7 +107,7 @@ const AboutPage = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-200">
+            <Card className="shadow-xl border-orange-200">
               <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-6 text-white text-center">
                 <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
                 <p className="text-lg opacity-90">
@@ -114,7 +115,7 @@ const AboutPage = () => {
                   keep more of their revenue, and build lasting relationships with their customers.
                 </p>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </section>

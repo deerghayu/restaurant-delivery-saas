@@ -1,4 +1,5 @@
-import { Palette, Upload } from 'lucide-react';
+import { Palette, Upload, Link } from 'lucide-react';
+import { FormField, SectionHeader } from '@/components/ui';
 
 interface BrandingTabProps {
   formData: {
@@ -14,17 +15,13 @@ interface BrandingTabProps {
 export default function BrandingTab({ formData, updateFormData }: BrandingTabProps) {
   return (
     <div className="space-y-8">
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-        <div className="flex items-start space-x-3">
-          <Palette className="w-5 h-5 text-purple-500 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-purple-900">Branding & Theme</h3>
-            <p className="text-sm text-purple-700 mt-1">
-              Customize your restaurant's visual identity and brand colors.
-            </p>
-          </div>
-        </div>
-      </div>
+      <SectionHeader
+        title="Branding & Theme"
+        description="Customize your restaurant's visual identity and brand colors."
+        icon={Palette}
+        variant="purple"
+        className="p-6"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="space-y-8">
@@ -64,38 +61,44 @@ export default function BrandingTab({ formData, updateFormData }: BrandingTabPro
             </div>
             
             <div className="mt-4">
-              <input
+              <FormField
+                label="Logo URL"
                 type="url"
                 value={formData.logo_url}
-                onChange={(e) => updateFormData('logo_url', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                onChange={(value) => updateFormData('logo_url', value)}
                 placeholder="https://example.com/logo.png"
+                icon={Link}
+                iconColor="text-blue-500"
+                helperText="Enter a direct link to your logo image"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Primary Brand Color
-            </label>
             <div className="flex items-center space-x-4">
-              <input
-                type="color"
-                value={formData.primary_color}
-                onChange={(e) => updateFormData('primary_color', e.target.value)}
-                className="w-16 h-12 border border-gray-300 rounded-lg cursor-pointer"
-              />
               <div>
+                <label className="form-label">
+                  <Palette className="w-4 h-4 inline mr-1 text-purple-500" />
+                  Primary Brand Color
+                </label>
                 <input
-                  type="text"
+                  type="color"
                   value={formData.primary_color}
                   onChange={(e) => updateFormData('primary_color', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
-                  pattern="^#[0-9A-Fa-f]{6}$"
+                  className="w-16 h-12 border border-gray-300 rounded-lg cursor-pointer"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  This color appears in your dashboard header and customer-facing pages
-                </p>
+              </div>
+              <div className="flex-1">
+                <FormField
+                  label="Hex Code"
+                  type="text"
+                  value={formData.primary_color}
+                  onChange={(value) => updateFormData('primary_color', value)}
+                  placeholder="#FF6B35"
+                  pattern="^#[0-9A-Fa-f]{6}$"
+                  title="Please enter a valid hex color code"
+                  helperText="This color appears in your dashboard header and customer-facing pages"
+                />
               </div>
             </div>
           </div>

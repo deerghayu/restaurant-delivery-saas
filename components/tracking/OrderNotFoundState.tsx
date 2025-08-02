@@ -11,7 +11,7 @@ export default function OrderNotFoundState() {
         </p>
         <a
           href="/"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          className="btn-primary"
         >
           Back to Home
         </a>

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import PageLayout from '@/components/PageLayout';
 import { MessageCircle, Book, Zap, Users, DollarSign, Shield, Clock, Phone, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { Card } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'Help Center & FAQ - ZoomDishes Support',
@@ -197,31 +198,28 @@ const HelpPage = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
-            <Link 
-              href="/docs/setup-guide" 
-              className="bg-gray-50 hover:bg-white hover:shadow-lg rounded-xl p-8 text-center transition-all duration-300 border border-orange-200 hover:border-orange-300"
-            >
-              <Book className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Setup Guide</h3>
-              <p className="text-gray-600">Step-by-step guide to get started</p>
+            <Link href="/docs/setup-guide">
+              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
+                <Book className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Setup Guide</h3>
+                <p className="text-gray-600">Step-by-step guide to get started</p>
+              </Card>
             </Link>
             
-            <Link 
-              href="/contact" 
-              className="bg-gray-50 hover:bg-white hover:shadow-lg rounded-xl p-8 text-center transition-all duration-300 border border-orange-200 hover:border-orange-300"
-            >
-              <MessageCircle className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Contact Support</h3>
-              <p className="text-gray-600">Get help from our Australian team</p>
+            <Link href="/contact">
+              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
+                <MessageCircle className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Contact Support</h3>
+                <p className="text-gray-600">Get help from our Australian team</p>
+              </Card>
             </Link>
             
-            <Link 
-              href="/pricing" 
-              className="bg-gray-50 hover:bg-white hover:shadow-lg rounded-xl p-8 text-center transition-all duration-300 border border-orange-200 hover:border-orange-300"
-            >
-              <DollarSign className="w-12 h-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">View Pricing</h3>
-              <p className="text-gray-600">Simple, transparent pricing</p>
+            <Link href="/pricing">
+              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
+                <DollarSign className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">View Pricing</h3>
+                <p className="text-gray-600">Simple, transparent pricing</p>
+              </Card>
             </Link>
           </div>
         </div>

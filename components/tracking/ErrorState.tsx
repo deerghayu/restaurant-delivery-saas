@@ -23,7 +23,7 @@ export default function ErrorState({ error, onRetry }: ErrorStateProps) {
         {onRetry && (
           <button
             onClick={onRetry}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors mr-4"
+            className="btn-primary mr-4"
           >
             Try Again
           </button>

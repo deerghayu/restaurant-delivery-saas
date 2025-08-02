@@ -1,5 +1,6 @@
 import { Phone, Mail, Car, Edit3, Trash2, Eye, EyeOff, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { Driver } from '@/types/database';
+import { Card } from '@/components/ui';
 
 interface DriverListProps {
   drivers: Driver[];
@@ -37,7 +38,7 @@ export default function DriverList({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+    <Card className="shadow-sm border-gray-100">
       <div className="px-6 py-4 border-b border-gray-100">
         <h2 className="text-xl font-semibold text-gray-900">Your Delivery Team ({drivers.length})</h2>
         <p className="text-gray-600 text-sm mt-1">Manage your drivers and track their performance</p>
@@ -52,7 +53,7 @@ export default function DriverList({
           <p className="text-gray-600 mb-6 max-w-sm mx-auto">Add your first driver to start managing deliveries and grow your delivery operations</p>
           <button
             onClick={onAddNew}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
+            className="btn-primary shadow-md"
           >
             Add Your First Driver
           </button>
@@ -158,6 +159,6 @@ export default function DriverList({
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

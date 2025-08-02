@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { Button } from '@/components/ui';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -24,11 +25,10 @@ export default function PageLayout({ children, showNavigation = true }: PageLayo
                 >
                   Sign In
                 </Link>
-                <Link 
-                  href="/auth?mode=signup" 
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Sign Up
+                <Link href="/auth?mode=signup">
+                  <Button variant="primary" size="sm">
+                    Sign Up
+                  </Button>
                 </Link>
               </div>
             </div>

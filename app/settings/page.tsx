@@ -5,8 +5,6 @@ import { supabase } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import {
   ArrowLeft,
-  AlertCircle,
-  CheckCircle,
   Sparkles
 } from 'lucide-react';
 import DelightfulLoading from '@/components/DelightfulLoading';
@@ -22,6 +20,7 @@ import {
   ProfileCompletionCard,
   SaveButton
 } from '@/components/settings';
+import { StatusMessage } from '@/components/ui';
 
 const businessHoursTemplate = {
   monday: { open: '09:00', close: '22:00', closed: false },
@@ -259,17 +258,12 @@ export default function SettingsPage() {
 
           {/* Message */}
           {message && (
-            <div className={`mb-6 p-4 rounded-lg flex items-center space-x-2 ${
-              message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-            }`}>
-              {message.type === 'success' ? 
-                <CheckCircle className="w-5 h-5 text-green-500" /> : 
-                <AlertCircle className="w-5 h-5 text-red-500" />
-              }
-              <p className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
-                {message.text}
-              </p>
-            </div>
+            <StatusMessage 
+              type={message.type} 
+              className="mb-6"
+            >
+              {message.text}
+            </StatusMessage>
           )}
 
           {/* Celebration Animation */}

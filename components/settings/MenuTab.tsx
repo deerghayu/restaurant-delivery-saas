@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { UtensilsCrossed, Plus, Edit, Trash2, DollarSign } from 'lucide-react';
+import { FormField, FormSelect, Button, SectionHeader, StatusMessage, Card } from '@/components/ui';
 
 interface MenuItem {
   id: string;
@@ -65,28 +66,24 @@ export default function MenuTab({ formData, updateFormData }: MenuTabProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <UtensilsCrossed className="w-5 h-5 text-blue-600 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-blue-900">Menu Management</h3>
-            <p className="text-sm text-blue-700 mt-1">
-              Manage your restaurant's menu items. These will be available when creating new orders.
-            </p>
-          </div>
-        </div>
-      </div>
+      <SectionHeader
+        title="Menu Management"
+        description="Manage your restaurant's menu items. These will be available when creating new orders."
+        icon={UtensilsCrossed}
+        variant="blue"
+      />
 
       {/* Add New Item Button */}
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">Menu Items ({menuItems.length})</h3>
-        <button
+        <Button
           onClick={() => setIsAddingItem(true)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+          variant="primary"
+          size="md"
+          icon={Plus}
         >
-          <Plus size={16} />
-          <span>Add Item</span>
-        </button>
+          Add Item
+        </Button>
       </div>
 
       {/* Add Item Form */}
@@ -94,80 +91,61 @@ export default function MenuTab({ formData, updateFormData }: MenuTabProps) {
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-4">Add New Menu Item</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Item Name *
-              </label>
-              <input
-                type="text"
-                value={newItem.name}
-                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Margherita Pizza"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price *
-              </label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={newItem.price}
-                  onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value) || 0 })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  placeholder="18.90"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                value={newItem.category}
-                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              >
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <input
-                type="text"
-                value={newItem.description}
-                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Classic tomato base with mozzarella"
-              />
-            </div>
+            <FormField
+              label="Item Name"
+              type="text"
+              value={newItem.name}
+              onChange={(value) => setNewItem({ ...newItem, name: value })}
+              placeholder="Margherita Pizza"
+              icon={UtensilsCrossed}
+              iconColor="text-blue-500"
+              required
+            />
+            
+            <FormField
+              label="Price (AUD)"
+              type="number"
+              value={newItem.price.toString()}
+              onChange={(value) => setNewItem({ ...newItem, price: parseFloat(value) || 0 })}
+              placeholder="18.90"
+              icon={DollarSign}
+              iconColor="text-green-500"
+              required
+            />
+            
+            <FormSelect
+              label="Category"
+              value={newItem.category}
+              onChange={(value) => setNewItem({ ...newItem, category: value })}
+              options={categories.map(cat => ({ value: cat, label: cat }))}
+              required
+            />
+            <FormField
+              label="Description"
+              type="text"
+              value={newItem.description || ''}
+              onChange={(value) => setNewItem({ ...newItem, description: value })}
+              placeholder="Classic tomato base with mozzarella"
+            />
           </div>
           <div className="flex space-x-3 mt-4">
-            <button
+            <Button
               onClick={addItem}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              variant="primary"
+              size="md"
             >
               Add Item
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setIsAddingItem(false);
                 setNewItem({ name: '', price: 0, category: 'Pizza', description: '' });
               }}
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+              variant="ghost"
+              size="md"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -175,7 +153,7 @@ export default function MenuTab({ formData, updateFormData }: MenuTabProps) {
       {/* Menu Items by Category */}
       <div className="space-y-6">
         {categories.map(category => (
-          <div key={category} className="bg-white border border-gray-200 rounded-lg">
+          <Card key={category}>
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
               <h4 className="font-medium text-gray-900 flex items-center justify-between">
                 <span>{category}</span>
@@ -203,20 +181,26 @@ export default function MenuTab({ formData, updateFormData }: MenuTabProps) {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button
+                        <Button
                           onClick={() => setEditingItem(item)}
-                          className="text-blue-600 hover:text-blue-800 p-1"
+                          variant="ghost"
+                          size="sm"
+                          icon={Edit}
                           title="Edit item"
+                          className="text-blue-600 hover:text-blue-800 p-1"
                         >
-                          <Edit size={16} />
-                        </button>
-                        <button
+                          Edit
+                        </Button>
+                        <Button
                           onClick={() => deleteItem(item.id)}
-                          className="text-red-600 hover:text-red-800 p-1"
+                          variant="ghost"
+                          size="sm"
+                          icon={Trash2}
                           title="Delete item"
+                          className="text-red-600 hover:text-red-800 p-1"
                         >
-                          <Trash2 size={16} />
-                        </button>
+                          Delete
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -227,84 +211,71 @@ export default function MenuTab({ formData, updateFormData }: MenuTabProps) {
                 </p>
               )}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
       {/* Edit Item Modal */}
       {editingItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <Card className="shadow-xl max-w-md w-full">
             <h4 className="font-medium text-gray-900 mb-4">Edit Menu Item</h4>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Item Name *
-                </label>
-                <input
-                  type="text"
-                  value={editingItem.name}
-                  onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price *
-                </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={editingItem.price}
-                    onChange={(e) => setEditingItem({ ...editingItem, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  value={editingItem.category}
-                  onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                >
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={editingItem.description || ''}
-                  onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
+              <FormField
+                label="Item Name"
+                type="text"
+                value={editingItem.name}
+                onChange={(value) => setEditingItem({ ...editingItem, name: value })}
+                placeholder="Margherita Pizza"
+                icon={UtensilsCrossed}
+                iconColor="text-blue-500"
+                required
+              />
+              
+              <FormField
+                label="Price (AUD)"
+                type="number"
+                value={editingItem.price.toString()}
+                onChange={(value) => setEditingItem({ ...editingItem, price: parseFloat(value) || 0 })}
+                placeholder="18.90"
+                icon={DollarSign}
+                iconColor="text-green-500"
+                required
+              />
+              
+              <FormSelect
+                label="Category"
+                value={editingItem.category}
+                onChange={(value) => setEditingItem({ ...editingItem, category: value })}
+                options={categories.map(cat => ({ value: cat, label: cat }))}
+                required
+              />
+              
+              <FormField
+                label="Description"
+                type="text"
+                value={editingItem.description || ''}
+                onChange={(value) => setEditingItem({ ...editingItem, description: value })}
+                placeholder="Classic tomato base with mozzarella"
+              />
             </div>
             <div className="flex space-x-3 mt-6">
-              <button
+              <Button
                 onClick={() => updateItem(editingItem.id, editingItem)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                variant="primary"
+                size="md"
               >
                 Update Item
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setEditingItem(null)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+                variant="ghost"
+                size="md"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

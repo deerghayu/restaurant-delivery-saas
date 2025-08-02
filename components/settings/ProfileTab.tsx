@@ -1,4 +1,5 @@
 import { Store, Phone, Mail, MapPin } from 'lucide-react';
+import { FormField, FormSelect, SectionHeader } from '@/components/ui';
 
 const australianStates = [
   { value: 'NSW', label: 'New South Wales' },
@@ -27,136 +28,98 @@ interface ProfileTabProps {
 export default function ProfileTab({ formData, updateFormData }: ProfileTabProps) {
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <Store className="w-5 h-5 text-blue-600 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-blue-900">Restaurant Profile</h3>
-            <p className="text-sm text-blue-700 mt-1">
-              This information appears on your restaurant profile and order confirmations.
-            </p>
-          </div>
-        </div>
-      </div>
+      <SectionHeader
+        title="Restaurant Profile"
+        description="This information appears on your restaurant profile and order confirmations."
+        icon={Store}
+        variant="blue"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Restaurant Name *
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => updateFormData('name', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            placeholder="Your Awesome Restaurant"
-            required
-          />
-        </div>
+        <FormField
+          label="Restaurant Name"
+          type="text"
+          value={formData.name}
+          onChange={(value) => updateFormData('name', value)}
+          placeholder="Your Awesome Restaurant"
+          icon={Store}
+          iconColor="text-orange-500"
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number *
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-2.5 h-4 w-4 text-green-500" />
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => updateFormData('phone', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="(02) 9876 5432"
-              required
-            />
-          </div>
-        </div>
+        <FormField
+          label="Phone Number"
+          type="tel"
+          value={formData.phone}
+          onChange={(value) => updateFormData('phone', value)}
+          placeholder="(02) 9876 5432"
+          icon={Phone}
+          iconColor="text-green-500"
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address *
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-blue-500" />
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => updateFormData('email', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="owner@restaurant.com"
-              required
-            />
-          </div>
-        </div>
+        <FormField
+          label="Email Address"
+          type="email"
+          value={formData.email}
+          onChange={(value) => updateFormData('email', value)}
+          placeholder="owner@restaurant.com"
+          icon={Mail}
+          iconColor="text-blue-500"
+          autoComplete="email"
+          required
+        />
       </div>
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-          <MapPin className="w-5 h-5 text-red-500" />
-          <span>Restaurant Address</span>
-        </h3>
+        <SectionHeader
+          title="Restaurant Address"
+          icon={MapPin}
+          variant="red"
+          className="mb-6"
+        />
 
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Street Address *
-            </label>
-            <input
-              type="text"
-              value={formData.street_address}
-              onChange={(e) => updateFormData('street_address', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="123 Collins Street"
-              required
-            />
-          </div>
+          <FormField
+            label="Street Address"
+            type="text"
+            value={formData.street_address}
+            onChange={(value) => updateFormData('street_address', value)}
+            placeholder="123 Collins Street"
+            icon={MapPin}
+            iconColor="text-red-500"
+            required
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Suburb *
-              </label>
-              <input
-                type="text"
-                value={formData.suburb}
-                onChange={(e) => updateFormData('suburb', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Melbourne"
-                required
-              />
-            </div>
+            <FormField
+              label="Suburb"
+              type="text"
+              value={formData.suburb}
+              onChange={(value) => updateFormData('suburb', value)}
+              placeholder="Melbourne"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                State *
-              </label>
-              <select
-                value={formData.state}
-                onChange={(e) => updateFormData('state', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                required
-              >
-                {australianStates.map(state => (
-                  <option key={state.value} value={state.value}>
-                    {state.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              label="State"
+              value={formData.state}
+              onChange={(value) => updateFormData('state', value)}
+              options={australianStates}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Postcode *
-              </label>
-              <input
-                type="text"
-                value={formData.postcode}
-                onChange={(e) => updateFormData('postcode', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="3000"
-                maxLength={4}
-                required
-              />
-            </div>
+            <FormField
+              label="Postcode"
+              type="text"
+              value={formData.postcode}
+              onChange={(value) => updateFormData('postcode', value)}
+              placeholder="3000"
+              maxLength={4}
+              pattern="[0-9]{4}"
+              title="Please enter a 4-digit postcode"
+              required
+            />
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
+import { StatusMessage, Button } from '@/components/ui';
 import { 
   Clock, 
   User, 
@@ -541,24 +542,27 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
             </div>
             <div className="space-y-3">
               <div className="flex space-x-2">
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'confirmed', 'Order confirmed and preparing');
                   }}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                  variant="success"
+                  size="sm"
+                  className="flex-1"
                 >
                   Confirm Order
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     cancelOrder(order.id);
                   }}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  variant="danger"
+                  size="sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
               <DriverSelector 
                 orderId={order.id} 
@@ -599,19 +603,20 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'ready', 'Order ready for pickup');
                   }}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                  className="flex-1 btn-primary py-2 px-3 text-sm"
                 >
                   Ready for Pickup
                 </button>
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     updateOrderStatus(order.id, 'picked_up', 'Order picked up by driver');
                   }}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  variant="primary"
+                  size="sm"
                 >
                   Picked Up
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -641,16 +646,18 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
               </div>
             </div>
             <div className="mt-3">
-              <button
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   updateOrderStatus(order.id, 'delivered', 'Order delivered successfully');
                 }}
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
+                variant="success"
+                size="sm"
+                icon={CheckCircle}
+                className="w-full"
               >
-                <CheckCircle size={16} />
-                <span>Mark as Delivered</span>
-              </button>
+                Mark as Delivered
+              </Button>
             </div>
           </div>
         )}
@@ -675,14 +682,9 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
     <div className="flex-1 p-6 bg-gradient-to-br from-orange-100 to-red-100">
       {/* Success Banner */}
       {recentAction && (
-        <div className="mb-6">
-          <div className="bg-green-500 text-white px-4 py-3 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <CheckCircle size={20} className="text-white" />
-              <p className="font-medium">{recentAction.message}</p>
-            </div>
-          </div>
-        </div>
+        <StatusMessage type="success" className="mb-6">
+          {recentAction.message}
+        </StatusMessage>
       )}
 
       {/* Order Management Container */}
@@ -702,13 +704,14 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
               </div>
               
               {/* New Order Button */}
-              <button 
+              <Button 
                 onClick={onNewOrderClick}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                variant="success"
+                size="md"
+                icon={Plus}
               >
-                <Plus size={16} />
-                <span>New Order</span>
-              </button>
+                New Order
+              </Button>
             </div>
             
             {/* Status Bar */}

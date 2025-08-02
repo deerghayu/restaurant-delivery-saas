@@ -1,4 +1,5 @@
 import { Truck, Phone, Star, MapPin } from 'lucide-react';
+import { Card } from '@/components/ui';
 
 interface Driver {
   name: string;
@@ -23,7 +24,7 @@ export default function StatusCard({
   getTimeUntil 
 }: StatusCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
+    <Card className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -75,6 +76,6 @@ export default function StatusCard({
           <div className="text-gray-600">{deliveryAddress}</div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

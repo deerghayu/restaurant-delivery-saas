@@ -1,4 +1,5 @@
 import { Crown, AlertCircle, Shield, Users, CheckCircle } from 'lucide-react';
+import { Card, StatusMessage, Button } from '@/components/ui';
 
 interface SubscriptionTabProps {
   formData: {
@@ -29,7 +30,7 @@ export default function SubscriptionTab({ formData }: SubscriptionTabProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <Card>
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-gray-900">Current Plan</h4>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -80,9 +81,9 @@ export default function SubscriptionTab({ formData }: SubscriptionTabProps) {
                 </div>
               )}
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <Card>
             <h4 className="font-medium text-gray-900 mb-3">Account Status</h4>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -103,11 +104,11 @@ export default function SubscriptionTab({ formData }: SubscriptionTabProps) {
                 <CheckCircle className="w-4 h-4 text-green-500" />
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <Card>
             <h4 className="font-medium text-gray-900 mb-3">Available Plans</h4>
             
             <div className="space-y-3">
@@ -141,10 +142,10 @@ export default function SubscriptionTab({ formData }: SubscriptionTabProps) {
               </div>
             </div>
 
-            <button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+            <Button variant="primary" size="sm" className="w-full mt-4">
               Upgrade Now
-            </button>
-          </div>
+            </Button>
+          </Card>
         </div>
       </div>
     </div>
