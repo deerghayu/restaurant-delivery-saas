@@ -254,8 +254,7 @@ const LandingPage = () => {
               Loved by Restaurant Owners Across Australia
             </h2>
             <p className="text-xl text-orange-100 max-w-3xl mx-auto">
-              See what other small restaurant owners are saying about
-              ZoomDishes
+              See what other small restaurant owners are saying about ZoomDishes
             </p>
           </div>
 
@@ -324,9 +323,7 @@ const LandingPage = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-2xl">🚚</span>
-                <span className="text-xl font-bold text-white">
-                  ZOOMDISHES
-                </span>
+                <span className="text-xl font-bold text-white">ZOOMDISHES</span>
               </div>
               <p className="text-sm">
                 Empowering Australian restaurants to own their delivery
