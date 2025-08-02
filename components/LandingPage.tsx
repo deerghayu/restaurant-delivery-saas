@@ -87,7 +87,7 @@ const LandingPage = () => {
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🚚</span>
               <span className="text-xl font-bold gradient-text">
-                DeliveryMate
+                ZOOMDISHES
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -121,7 +121,7 @@ const LandingPage = () => {
               </h1>
 
               <p className="text-xl text-gray-700 mb-8 leading-relaxed">
-                Stop paying hefty commissions to delivery giants. DeliveryMate
+                Stop paying hefty commissions to delivery giants. ZOOMDISHES
                 gives small Australian restaurants everything they need to run
                 their own delivery service with professional branded tracking.
               </p>
@@ -255,7 +255,7 @@ const LandingPage = () => {
             </h2>
             <p className="text-xl text-orange-100 max-w-3xl mx-auto">
               See what other small restaurant owners are saying about
-              DeliveryMate
+              ZOOMDISHES
             </p>
           </div>
 
@@ -295,7 +295,7 @@ const LandingPage = () => {
           </h2>
           <p className="text-xl text-gray-300 mb-8">
             Join hundreds of Australian restaurants already saving money and
-            building their brand with DeliveryMate.
+            building their brand with ZOOMDISHES.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -325,7 +325,7 @@ const LandingPage = () => {
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-2xl">🚚</span>
                 <span className="text-xl font-bold text-white">
-                  DeliveryMate
+                  ZOOMDISHES
                 </span>
               </div>
               <p className="text-sm">
@@ -426,7 +426,7 @@ const LandingPage = () => {
           </div>
 
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 DeliveryMate. Made with ❤️ in Australia.</p>
+            <p>&copy; 2025 ZOOMDISHES. Made with ❤️ in Australia.</p>
           </div>
         </div>
       </footer>

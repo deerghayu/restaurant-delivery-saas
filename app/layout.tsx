@@ -8,7 +8,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DeliveryMate - Restaurant Delivery Management",
+  title: "ZOOMDISHES - Restaurant Delivery Management",
   description: "Lightweight delivery management for Australian restaurants",
   keywords:
     "restaurant delivery, food delivery management, Australian restaurants",

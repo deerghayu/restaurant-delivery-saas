@@ -77,7 +77,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <span className="text-3xl">🚚</span>
-            <span className="text-2xl font-bold gradient-text">DeliveryMate</span>
+            <span className="text-2xl font-bold gradient-text">ZOOMDISHES</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900">
             {mode === 'login' ? 'Welcome Back' : 'Start Your Free Trial'}
