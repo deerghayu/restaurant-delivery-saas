@@ -1,4 +1,4 @@
-# ZOOMDISHES - Restaurant Delivery Management SaaS
+# ZoomDishes - Restaurant Delivery Management SaaS
 
 A lightweight, affordable delivery management platform built specifically for Australian small restaurants.
 
