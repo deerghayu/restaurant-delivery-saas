@@ -20,8 +20,9 @@ export const metadata: Metadata = {
     "food dispatch and tracking",
     "delivery tracking",
     "fast delivery",
-    "real-time tracking",
-    "restaurant owner owned dispatch and delivery tracking saas",
+    "real-time food delivery tracking",
+    "restaurant owned dispatch and delivery tracking service",
+    "restaurant delivery SaaS",
   ],
   openGraph: {
     title: "ZoomDishes: Fast, Local Food Dispatch & Delivery in Australia",
