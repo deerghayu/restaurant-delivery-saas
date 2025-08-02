@@ -8,7 +8,7 @@ interface ErrorStateProps {
 export default function ErrorState({ error, onRetry }: ErrorStateProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
+      <div className="bg-white rounded-xl shadow-lg p-8 border border-orange-200 text-center">
         <div className="text-6xl mb-4">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
         </div>

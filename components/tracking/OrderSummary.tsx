@@ -14,7 +14,7 @@ interface OrderSummaryProps {
 export default function OrderSummary({ items, total }: OrderSummaryProps) {
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Order Summary
         </h3>
@@ -43,7 +43,7 @@ export default function OrderSummary({ items, total }: OrderSummaryProps) {
       </div>
 
       {/* Contact Card */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Need Help?
         </h3>

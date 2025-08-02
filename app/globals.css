@@ -42,7 +42,7 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200;
+    @apply bg-white rounded-xl shadow-sm border border-orange-200 hover:border-orange-300 hover:shadow-md transition-all duration-200;
   }
 
   .gradient-text {

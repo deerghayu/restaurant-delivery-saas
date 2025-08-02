@@ -106,7 +106,7 @@ const AboutPage = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-200">
               <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-6 text-white text-center">
                 <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
                 <p className="text-lg opacity-90">

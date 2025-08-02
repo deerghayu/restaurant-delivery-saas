@@ -171,7 +171,7 @@ const SetupGuidePage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl p-8 shadow-sm text-center">
+              <div key={index} className="bg-white rounded-xl p-8 shadow-sm text-center border border-orange-200 hover:border-orange-300 transition-colors duration-300">
                 <feature.icon className="w-12 h-12 text-orange-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>

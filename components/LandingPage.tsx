@@ -234,7 +234,7 @@ const LandingPage = () => {
             </div>
 
             <div className="animate-slide-up">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+              <div className="bg-white rounded-2xl shadow-2xl p-8 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
                 <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-6 mb-6">
                   <div className="flex items-center justify-between text-white mb-4">
                     <h3 className="font-bold text-lg">Mario's Pizza</h3>
@@ -319,7 +319,7 @@ const LandingPage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-8 shadow-lg">
+              <div key={index} className="bg-white rounded-xl p-8 shadow-lg border border-orange-200 hover:border-orange-300 transition-colors duration-300">
                 <div className="flex items-center mb-4">
                   <span className="text-3xl mr-3">{testimonial.avatar}</span>
                   <div>

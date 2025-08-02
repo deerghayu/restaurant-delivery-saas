@@ -118,7 +118,7 @@ const PricingPage = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-xl shadow-lg overflow-hidden">
+            <table className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-orange-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Service</th>

@@ -15,7 +15,7 @@ interface OrderTimelineProps {
 
 export default function OrderTimeline({ timeline, getTimeAgo, getTimeUntil }: OrderTimelineProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-200 hover:border-orange-300 transition-colors duration-300">
       <h3 className="text-xl font-bold text-gray-900 mb-6">
         Order Timeline
       </h3>

@@ -80,7 +80,7 @@ const ContactPage = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {contactMethods.map((method, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-8 text-center hover:bg-white hover:shadow-lg transition-all duration-300">
+              <div key={index} className="bg-gray-50 rounded-xl p-8 text-center hover:bg-white hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-300">
                 <div className="flex justify-center mb-6">
                   {method.icon}
                 </div>
@@ -127,7 +127,7 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-200">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Contact Form</h3>
               <form className="space-y-4">
                 <div>
