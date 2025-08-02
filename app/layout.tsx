@@ -8,10 +8,51 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ZoomDishes - Restaurant Delivery Management",
-  description: "Lightweight delivery management for Australian restaurants",
-  keywords:
-    "restaurant delivery, food delivery management, Australian restaurants",
+  metadataBase: new URL("https://www.zoomdishes.com"),
+  title: "ZoomDishes: Fast, Local Food Dispatch & Delivery in Australia",
+  description:
+    "ZoomDishes is a location-aware food dispatch and delivery platform for Australian restaurants. Get real-time tracking, fast delivery, and seamless order management.",
+  keywords: [
+    "fast food delivery",
+    "local dishes near me",
+    "Australian food delivery startup",
+    "food delivery",
+    "food dispatch and tracking",
+    "delivery tracking",
+    "fast delivery",
+    "real-time tracking",
+    "restaurant owner owned dispatch and delivery tracking saas",
+  ],
+  openGraph: {
+    title: "ZoomDishes: Fast, Local Food Dispatch & Delivery in Australia",
+    description:
+      "The future of food delivery is here. ZoomDishes offers a modern, fast, and reliable dispatch platform for Australian restaurants.",
+    url: "https://www.zoomdishes.com",
+    siteName: "ZoomDishes",
+    locale: "en_AU",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZoomDishes: Fast, Local Food Dispatch & Delivery in Australia",
+    description:
+      "The future of food delivery is here. ZoomDishes offers a modern, fast, and reliable dispatch platform for Australian restaurants.",
+    // creator: "@yourtwitterhandle",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://www.zoomdishes.com",
+  },
 };
 
 export default function RootLayout({

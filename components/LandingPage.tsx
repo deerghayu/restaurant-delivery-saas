@@ -14,6 +14,7 @@ import {
   Zap,
   Heart,
 } from "lucide-react";
+import Head from 'next/head';
 
 const LandingPage = () => {
   const [email, setEmail] = useState("");
@@ -78,14 +79,86 @@ const LandingPage = () => {
     },
   ];
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "url": "https://www.zoomdishes.com",
+        "name": "ZoomDishes",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://www.zoomdishes.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FoodEstablishment",
+        "name": "ZoomDishes",
+        "description": "A fast, location-aware food dispatch and delivery platform for Australian restaurants.",
+        "url": "https://www.zoomdishes.com",
+        "telephone": "+61299999999",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "123 Fake Street",
+          "addressLocality": "Sydney",
+          "addressRegion": "NSW",
+          "postalCode": "2000",
+          "addressCountry": "AU"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -33.8688,
+          "longitude": 151.2093
+        },
+        "servesCuisine": "Various",
+        "priceRange": "$$",
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "opens": "00:00",
+            "closes": "23:59"
+          }
+        ],
+        "potentialAction": {
+          "@type": "OrderAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.zoomdishes.com/dashboard",
+            "actionPlatform": [
+              "http://schema.org/DesktopWebPlatform",
+              "http://schema.org/IOSPlatform",
+              "http://schema.org/AndroidPlatform"
+            ]
+          }
+        }
+      }
+    ]
+  };
+
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      </Head>
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">🚚</span>
+              <span className="text-2xl" aria-hidden="true">🚚</span>
               <span className="text-xl font-bold gradient-text">ZOOMDISHES</span>
             </div>
             <div className="flex items-center space-x-3">
@@ -103,16 +176,16 @@ const LandingPage = () => {
               </Link>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section id="hero" className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">
-                🇦🇺 Made in Australia
+                <span role="img" aria-label="Australian Flag">🇦🇺</span> Made in Australia
               </span>
 
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -143,17 +216,17 @@ const LandingPage = () => {
 
               <div className="flex items-center space-x-6 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" aria-hidden="true" />
                   <span className="font-semibold">4.9/5</span>
                   <span>rating</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Heart className="w-4 h-4 text-red-500" />
+                  <Heart className="w-4 h-4 text-red-500" aria-hidden="true" />
                   <span className="font-semibold">500+</span>
                   <span>happy restaurants</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Clock className="w-4 h-4 text-green-500" />
+                  <Clock className="w-4 h-4 text-green-500" aria-hidden="true" />
                   <span className="font-semibold">5 min</span>
                   <span>setup time</span>
                 </div>
@@ -202,7 +275,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -233,7 +306,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
+      <section id="testimonials" className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -269,7 +342,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-900">
+      <section id="cta" className="py-20 bg-gray-900">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Take Control of Your Delivery?
@@ -298,13 +371,12 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-800 text-gray-300 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl">🚚</span>
+                <span className="text-2xl" aria-hidden="true">🚚</span>
                 <span className="text-xl font-bold text-white">ZOOMDISHES</span>
               </div>
               <p className="text-sm">
@@ -316,28 +388,28 @@ const LandingPage = () => {
               <h4 className="font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/#features"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/pricing"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/dashboard"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Demo
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -346,28 +418,28 @@ const LandingPage = () => {
               <h4 className="font-semibold text-white mb-4">Support</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/help"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Help Center
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/contact"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/docs/setup-guide"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Setup Guide
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -376,39 +448,39 @@ const LandingPage = () => {
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/about"
                     className="hover:text-orange-400 transition-colors"
                   >
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/privacy"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Privacy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/terms"
                     className="hover:text-orange-400 transition-colors"
                   >
                     Terms
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2025 ZoomDishes. Made with ❤️ in Australia.</p>
+            <p>&copy; 2025 ZoomDishes. Made with <span role="img" aria-label="love">❤️</span> in Australia.</p>
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 };
 
