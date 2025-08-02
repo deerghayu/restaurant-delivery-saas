@@ -83,10 +83,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
             {mode === 'login' ? 'Welcome Back' : 'Start Your Free Trial'}
           </h2>
           <p className="text-gray-600 mt-2">
-            {mode === 'login' 
-              ? 'Sign in to your restaurant dashboard' 
-              : 'Join hundreds of Australian restaurants'
-            }
+            {mode === 'login' ? 'Sign in to your restaurant dashboard' : 'Join hundreds of Australian restaurants'}
           </p>
         </div>
 
@@ -179,10 +176,7 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>
-              {loading 
-                ? (mode === 'login' ? 'Signing In...' : 'Creating Account...') 
-                : (mode === 'login' ? 'Sign In' : 'Create Account')
-              }
+              {loading ? (mode === 'login' ? 'Signing In...' : 'Creating Account...') : (mode === 'login' ? 'Sign In' : 'Create Account')}
             </span>
           </button>
         </form>
@@ -200,12 +194,10 @@ export default function AuthForm({ mode, onToggleMode, onSuccess }: AuthFormProp
         </div>
 
         {mode === 'signup' && (
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              By creating an account, you agree to our Terms of Service and Privacy Policy.
-              14-day free trial, no credit card required.
-            </p>
-          </div>
+          <p className="mt-6 text-center text-xs text-gray-500">
+            By creating an account, you agree to our Terms of Service and Privacy Policy.
+            14-day free trial, no credit card required.
+          </p>
         )}
       </div>
     </div>

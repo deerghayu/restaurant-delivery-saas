@@ -86,18 +86,21 @@ const LandingPage = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🚚</span>
-              <span className="text-xl font-bold gradient-text">
-                ZOOMDISHES
-              </span>
+              <span className="text-xl font-bold gradient-text">ZOOMDISHES</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Link
-                href="/dashboard"
+                href="/auth"
                 className="text-gray-600 hover:text-orange-600 font-medium transition-colors"
               >
-                Demo Dashboard
+                Sign In
               </Link>
-              <Link href="/auth" className="btn-primary">Get Started</Link>
+              <Link 
+                href="/auth?mode=signup" 
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Sign Up
+              </Link>
             </div>
           </div>
         </div>
@@ -108,11 +111,9 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
-              <div className="flex items-center space-x-2 mb-4">
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
-                  🇦🇺 Made in Australia
-                </span>
-              </div>
+              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">
+                🇦🇺 Made in Australia
+              </span>
 
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 Your Restaurant.
@@ -127,7 +128,7 @@ const LandingPage = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link href="/auth" className="btn-primary flex items-center justify-center space-x-2">
+                <Link href="/auth?mode=signup" className="btn-primary flex items-center justify-center space-x-2">
                   <span>Start Free Trial</span>
                   <ArrowRight className="w-5 h-5" />
                 </Link>
@@ -171,36 +172,26 @@ const LandingPage = () => {
                   <div className="bg-white bg-opacity-10 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
                       <Truck className="w-5 h-5" />
-                      <span className="font-semibold">
-                        Order #1234 - En Route
-                      </span>
+                      <span className="font-semibold">Order #1234 - En Route</span>
                     </div>
-                    <p className="text-sm opacity-90">
-                      Your pizza is 8 minutes away!
-                    </p>
+                    <p className="text-sm opacity-90">Your pizza is 8 minutes away!</p>
                     <div className="mt-3 bg-white bg-opacity-20 rounded-full h-2">
                       <div className="bg-white h-2 rounded-full w-3/4 animate-pulse"></div>
                     </div>
                   </div>
-                </div>
+                  </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                    <span className="text-green-800 font-medium">
-                      ✓ Order Confirmed
-                    </span>
+                    <span className="text-green-800 font-medium">✓ Order Confirmed</span>
                     <span className="text-green-600 text-sm">2:15 PM</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                    <span className="text-green-800 font-medium">
-                      ✓ Pizza in Oven
-                    </span>
+                    <span className="text-green-800 font-medium">✓ Pizza in Oven</span>
                     <span className="text-green-600 text-sm">2:25 PM</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
-                    <span className="text-orange-800 font-medium">
-                      🚚 Out for Delivery
-                    </span>
+                    <span className="text-orange-800 font-medium">🚚 Out for Delivery</span>
                     <span className="text-orange-600 text-sm">2:40 PM</span>
                   </div>
                 </div>
@@ -215,8 +206,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need to
-              <span className="gradient-text"> Own Your Delivery</span>
+              Everything You Need to<span className="gradient-text"> Own Your Delivery</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Built specifically for small Australian restaurants who want to
@@ -234,12 +224,8 @@ const LandingPage = () => {
                 <div className="mb-4 flex justify-center group-hover:animate-bounce-gentle">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -264,12 +250,8 @@ const LandingPage = () => {
                 <div className="flex items-center mb-4">
                   <span className="text-3xl mr-3">{testimonial.avatar}</span>
                   <div>
-                    <h4 className="font-bold text-gray-900">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {testimonial.restaurant}
-                    </p>
+                    <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-600">{testimonial.restaurant}</p>
                   </div>
                 </div>
                 <p className="text-gray-700 italic leading-relaxed">
@@ -305,7 +287,7 @@ const LandingPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="px-6 py-3 rounded-lg text-gray-900 text-lg flex-1 max-w-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
-            <Link href="/auth" className="btn-primary text-lg px-8">
+            <Link href="/auth?mode=signup" className="btn-primary text-lg px-8">
               Start Free Trial
             </Link>
           </div>
@@ -326,8 +308,7 @@ const LandingPage = () => {
                 <span className="text-xl font-bold text-white">ZOOMDISHES</span>
               </div>
               <p className="text-sm">
-                Empowering Australian restaurants to own their delivery
-                experience.
+                Empowering Australian restaurants to own their delivery experience.
               </p>
             </div>
 
