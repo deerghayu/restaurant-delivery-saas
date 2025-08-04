@@ -15,7 +15,7 @@ interface OrderSummaryProps {
 export default function OrderSummary({ items, total }: OrderSummaryProps) {
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
+      <Card className="bg-muted hover:bg-card hover:shadow-lg transition-all duration-300 border border-brand-light hover:border-brand-light">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Order Summary
         </h3>
@@ -44,36 +44,38 @@ export default function OrderSummary({ items, total }: OrderSummaryProps) {
       </Card>
 
       {/* Contact Card */}
-      <Card className="shadow-lg border-orange-200 hover:border-orange-300 transition-colors duration-300">
+      <Card className="bg-muted hover:bg-card hover:shadow-lg transition-all duration-300 border border-brand-light hover:border-brand-light">
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Need Help?
         </h3>
         <div className="space-y-3">
-          <Button variant="primary" size="md" icon={Phone} className="w-full">
+          <Button variant="default" className="w-full">
             Call Restaurant
           </Button>
-          <Button variant="ghost" size="md" className="w-full">
+          <Button variant="ghost" className="w-full">
             Report an Issue
           </Button>
         </div>
       </Card>
 
       {/* Rate Experience */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 rounded-xl shadow-lg p-6 text-white">
         <h3 className="text-lg font-bold mb-2">
           How was your experience?
         </h3>
-        <p className="text-orange-100 text-sm mb-4">
+        <p className="text-brand-subtle text-sm mb-4">
           Help us improve by rating your delivery
         </p>
         <div className="flex justify-center space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
-            <button
+            <Button
               key={star}
-              className="text-yellow-300 hover:text-yellow-100 transition-colors"
+              variant="ghost"
+              size="icon"
+              className="text-yellow-300 hover:text-yellow-100 hover:bg-white/10"
             >
               <Star className="w-8 h-8" />
-            </button>
+            </Button>
           ))}
         </div>
       </div>

@@ -1,8 +1,42 @@
-export { default as BaseModal } from './BaseModal';
-export { default as FormField } from './FormField';
-export { default as FormSelect } from './FormSelect';
-export { default as StatusMessage } from './StatusMessage';
-export { default as Button } from './Button';
-export { default as Card } from './Card';
-export { default as SectionHeader } from './SectionHeader';
-export { default as StatusBadge } from './StatusBadge';
+// shadcn/ui components only
+export { Button } from './shadcn-button';
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './shadcn-card';
+export { Input } from './input';
+export { Label } from './label';
+export { 
+  Select, 
+  SelectGroup, 
+  SelectValue, 
+  SelectTrigger, 
+  SelectContent, 
+  SelectLabel, 
+  SelectItem, 
+  SelectSeparator 
+} from './select';
+export { 
+  Dialog, 
+  DialogPortal, 
+  DialogOverlay, 
+  DialogClose, 
+  DialogTrigger, 
+  DialogContent, 
+  DialogHeader, 
+  DialogFooter, 
+  DialogTitle, 
+  DialogDescription 
+} from './dialog';
+export { Badge } from './badge';
+export { Alert, AlertTitle, AlertDescription } from './alert';
+export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export { 
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuGroup
+} from './dropdown-menu';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { Separator } from './separator';
+export { Textarea } from './textarea';

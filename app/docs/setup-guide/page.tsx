@@ -171,8 +171,8 @@ const SetupGuidePage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl p-8 shadow-sm text-center border border-orange-200 hover:border-orange-300 transition-colors duration-300">
-                <feature.icon className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+              <div key={index} className="bg-white rounded-xl p-8 shadow-sm text-center border border-brand-light hover:border-brand-light transition-colors duration-300">
+                <feature.icon className="w-12 h-12 text-brand mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </div>
@@ -191,7 +191,7 @@ const SetupGuidePage = () => {
           </div>
 
           <div className="space-y-8">
-            <div className="bg-orange-50 rounded-xl p-8 border border-orange-200">
+            <div className="bg-brand-light rounded-xl p-8 border border-brand-light">
               <h3 className="text-xl font-bold text-gray-900 mb-3">🚀 Start Small, Scale Fast</h3>
               <p className="text-gray-700">
                 Begin with 1-2 drivers to test the system, then add more as you see the value. 
@@ -224,19 +224,19 @@ const SetupGuidePage = () => {
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-subtle mb-8">
             Join hundreds of Australian restaurants already using ZoomDishes
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/auth?mode=signup" 
-              className="inline-flex items-center bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center bg-white text-brand px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
             >
               Start Free Trial
             </Link>
             <Link 
               href="/contact" 
-              className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-orange-600 transition-colors"
+              className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover-text-brand transition-colors"
             >
               Get Help with Setup
             </Link>

@@ -105,7 +105,7 @@ const TermsPage = () => {
             </p>
             <a 
               href="mailto:legal@zoomdishes.com"
-              className="inline-flex items-center bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+              className="inline-flex items-center bg-white text-brand px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
             >
               Contact Legal Team
             </a>

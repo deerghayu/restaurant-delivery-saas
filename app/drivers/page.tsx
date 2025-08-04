@@ -7,8 +7,8 @@ import { Driver } from "@/types/database";
 import { getRestaurantId } from "@/utils/restaurant";
 import { VEHICLE_TYPES, APP_CONFIG, SUCCESS_MESSAGES, ERROR_MESSAGES } from "@/lib/constants";
 import DelightfulLoading from "@/components/DelightfulLoading";
-import DriverFormModal from "@/components/drivers/DriverFormModal";
-import { StatusMessage, Button } from '@/components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Label } from '@/components/ui';
+import { Alert, AlertDescription, Button } from '@/components/ui';
 import { 
   ArrowLeft, 
   Plus, 
@@ -317,7 +317,7 @@ export default function DriversPage() {
               </Link>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
-                  <Users className="w-7 h-7 text-orange-500" />
+                  <Users className="w-7 h-7 text-brand" />
                   <span>Delivery Team</span>
                 </h1>
                 <p className="text-gray-600 mt-1">Manage your delivery drivers and their performance</p>
@@ -325,9 +325,7 @@ export default function DriversPage() {
             </div>
             <Button
               onClick={() => setShowNewDriverForm(true)}
-              variant="primary"
-              size="md"
-              icon={Plus}
+              variant="default"
               className="shadow-md hover:shadow-lg"
             >
               Add New Driver
@@ -336,12 +334,11 @@ export default function DriversPage() {
 
           {/* Message */}
           {message && (
-            <StatusMessage 
-              type={message.type} 
-              className="mb-6"
-            >
-              {message.text}
-            </StatusMessage>
+            <Alert className="mb-6" variant={message.type === 'error' ? 'destructive' : 'default'}>
+              <AlertDescription>
+                {message.text}
+              </AlertDescription>
+            </Alert>
           )}
 
           {/* Driver Stats */}
@@ -410,15 +407,14 @@ export default function DriversPage() {
             
             {drivers.length === 0 ? (
               <div className="p-12 text-center">
-                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Users className="w-10 h-10 text-orange-500" />
+                <div className="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Users className="w-10 h-10 text-brand" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">No drivers yet</h3>
                 <p className="text-gray-600 mb-6 max-w-sm mx-auto">Add your first driver to start managing deliveries and grow your delivery operations</p>
                 <Button
                   onClick={() => setShowNewDriverForm(true)}
-                  variant="primary"
-                  size="md"
+                  variant="default"
                   className="shadow-md"
                 >
                   Add Your First Driver
@@ -434,7 +430,7 @@ export default function DriversPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
-                          <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-xl">
+                          <div className="w-14 h-14 bg-brand-light rounded-full flex items-center justify-center text-xl">
                             {driver.avatar_emoji}
                           </div>
                           <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
@@ -480,7 +476,7 @@ export default function DriversPage() {
                               <p className="text-xs text-gray-500">Deliveries</p>
                             </div>
                             <div className="text-center">
-                              <p className="text-lg font-bold text-orange-600 flex items-center">
+                              <p className="text-lg font-bold text-brand flex items-center">
                                 <span className="text-yellow-400 mr-1">⭐</span>
                                 {driver.average_rating.toFixed(1)}
                               </p>
@@ -495,21 +491,20 @@ export default function DriversPage() {
                             onClick={() => toggleDriverStatus(driver)}
                             variant={driver.status === 'available' ? 'ghost' : 'success'}
                             size="sm"
-                            icon={driver.status === 'available' ? EyeOff : Eye}
-                            title={driver.status === 'available' ? 'Set offline' : 'Set available'}
                             className="p-2"
+                            title={driver.status === 'available' ? 'Set offline' : 'Set available'}
                           >
-                            {driver.status === 'available' ? 'Set offline' : 'Set available'}
+                            {driver.status === 'available' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
                           
                           <Button
                             onClick={() => handleEdit(driver)}
                             variant="ghost"
                             size="sm"
-                            icon={Edit3}
                             title="Edit driver"
                             className="p-2 text-blue-600 hover:bg-blue-100"
                           >
+                            <Edit3 className="w-4 h-4 mr-1" />
                             Edit
                           </Button>
                           
@@ -517,10 +512,10 @@ export default function DriversPage() {
                             onClick={() => handleDeleteClick(driver)}
                             variant="ghost"
                             size="sm"
-                            icon={Trash2}
                             title="Remove driver"
                             className="p-2 text-red-600 hover:bg-red-100"
                           >
+                            <Trash2 className="w-4 h-4 mr-1" />
                             Delete
                           </Button>
                         </div>
@@ -534,15 +529,53 @@ export default function DriversPage() {
         </div>
 
         {/* New/Edit Driver Modal */}
-        <DriverFormModal
-          isOpen={showNewDriverForm}
-          editingDriver={editingDriver}
-          formData={formData}
-          onFormDataChange={handleFormDataChange}
-          onSubmit={handleSubmit}
-          onClose={resetForm}
-          loading={formLoading}
-        />
+        <Dialog open={showNewDriverForm} onOpenChange={(open) => !open && resetForm()}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingDriver ? 'Edit Driver' : 'Add New Driver'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleFormDataChange('name', e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => handleFormDataChange('phone', e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleFormDataChange('email', e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" disabled={formLoading} className="flex-1">
+                  {formLoading ? 'Saving...' : (editingDriver ? 'Update Driver' : 'Add Driver')}
+                </Button>
+                <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         {/* Delete Driver Confirmation Modal */}
         {showDeleteModal && driverToDelete && (
@@ -564,7 +597,7 @@ export default function DriversPage() {
               
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-2xl">
+                  <div className="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center text-2xl">
                     {driverToDelete.avatar_emoji}
                   </div>
                   <div>
@@ -576,15 +609,17 @@ export default function DriversPage() {
                   </div>
                 </div>
                 
-                <StatusMessage type="warning" className="mb-6">
-                  <div>
-                    <p className="font-medium text-sm">Are you sure you want to remove this driver?</p>
-                    <p className="text-sm mt-1">
-                      This will permanently remove <strong>{driverToDelete.name}</strong> from your delivery team. 
-                      All their delivery history will be preserved, but they won't be able to receive new orders.
-                    </p>
-                  </div>
-                </StatusMessage>
+                <Alert variant="destructive" className="mb-6">
+                  <AlertDescription>
+                    <div>
+                      <p className="font-medium text-sm">Are you sure you want to remove this driver?</p>
+                      <p className="text-sm mt-1">
+                        This will permanently remove <strong>{driverToDelete.name}</strong> from your delivery team. 
+                        All their delivery history will be preserved, but they won't be able to receive new orders.
+                      </p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
                 
                 <div className="flex space-x-4">
                   <Button
@@ -599,11 +634,10 @@ export default function DriversPage() {
                   <Button
                     type="button"
                     onClick={handleDeleteConfirm}
-                    variant="danger"
-                    size="lg"
-                    icon={Trash2}
+                    variant="destructive"
                     className="flex-1"
                   >
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Remove Driver
                   </Button>
                 </div>

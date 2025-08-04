@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const contactMethods = [
   {
-    icon: <Mail className="w-8 h-8 text-orange-500" />,
+    icon: <Mail className="w-8 h-8 text-brand" />,
     title: 'General Inquiries',
     description: 'Questions about ZoomDishes or want to learn more?',
     contact: 'hello@zoomdishes.com',
@@ -39,7 +39,7 @@ const contactMethods = [
 
 const officeInfo = [
   {
-    icon: <MapPin className="w-6 h-6 text-orange-500" />,
+    icon: <MapPin className="w-6 h-6 text-brand" />,
     label: 'Address',
     value: '123 Fake Street, Sydney, NSW 2000, Australia',
   },
@@ -81,14 +81,14 @@ function ContactPage() {
           
           <div className="grid md:grid-cols-3 gap-8">
             {contactMethods.map((method, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-8 text-center hover:bg-white hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-300">
+              <div key={index} className="bg-gray-50 rounded-xl p-8 text-center hover:bg-white hover:shadow-lg transition-all duration-300 border border-brand-light hover:border-brand-light">
                 <div className="flex justify-center mb-6">
                   {method.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{method.title}</h3>
                 <p className="text-gray-600 mb-6">{method.description}</p>
                 <a href={method.href}>
-                  <Button variant="primary" size="md" className="w-full">
+                  <Button variant="default" className="w-full">
                     {method.contact}
                   </Button>
                 </a>
@@ -118,16 +118,16 @@ function ContactPage() {
                 ))}
               </div>
               
-              <div className="mt-8 p-6 bg-orange-50 rounded-xl border border-orange-200">
-                <h3 className="font-bold text-orange-800 mb-2">🇦🇺 Local Australian Support</h3>
-                <p className="text-orange-700">
+              <div className="mt-8 p-6 bg-brand-light rounded-xl border border-brand-light">
+                <h3 className="font-bold text-brand-dark mb-2">🇦🇺 Local Australian Support</h3>
+                <p className="text-brand-dark">
                   Our entire team is based in Australia. We understand the local market, 
                   regulations, and challenges that Australian restaurants face.
                 </p>
               </div>
             </div>
 
-            <Card className="shadow-xl border-orange-200">
+            <Card className="shadow-xl border-brand-light">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Contact Form</h3>
               <form className="space-y-4">
                 <div>
@@ -137,7 +137,7 @@ function ContactPage() {
                   <input
                     type="text"
                     id="name"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand"
                     placeholder="Mario's Pizza"
                   />
                 </div>
@@ -148,7 +148,7 @@ function ContactPage() {
                   <input
                     type="email"
                     id="email"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand"
                     placeholder="owner@mariopizza.com"
                   />
                 </div>
@@ -158,7 +158,7 @@ function ContactPage() {
                   </label>
                   <select
                     id="subject"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand"
                   >
                     <option>General Inquiry</option>
                     <option>Technical Support</option>
@@ -173,14 +173,13 @@ function ContactPage() {
                   <textarea
                     id="message"
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand"
                     placeholder="Tell us how we can help..."
                   ></textarea>
                 </div>
                 <Button
                   type="submit"
-                  variant="primary"
-                  size="md"
+                  variant="default"
                   className="w-full"
                 >
                   Send Message

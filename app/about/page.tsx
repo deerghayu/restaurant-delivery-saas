@@ -37,7 +37,7 @@ const values = [
     description: 'Australian-based team that understands your market and challenges.',
   },
   {
-    icon: <Zap className="w-8 h-8 text-orange-500" />,
+    icon: <Zap className="w-8 h-8 text-primary" />,
     title: 'Fast Innovation',
     description: 'We move quickly to build features that matter to your business.',
   },
@@ -50,7 +50,7 @@ const AboutPage = () => {
       <section className="bg-gradient-to-br from-orange-50 to-red-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold mb-6 inline-block">
+            <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-sm font-semibold mb-6 inline-block">
               🇦🇺 Made in Australia, for Australia
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
@@ -72,7 +72,7 @@ const AboutPage = () => {
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-4">
-                  <stat.icon className="w-8 h-8 text-orange-600" />
+                  <stat.icon className="w-8 h-8 text-primary" />
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -107,8 +107,8 @@ const AboutPage = () => {
                 </p>
               </div>
             </div>
-            <Card className="shadow-xl border-orange-200">
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-6 text-white text-center">
+            <Card className="shadow-xl border-brand-light">
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 rounded-lg p-6 text-white text-center">
                 <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
                 <p className="text-lg opacity-90">
                   To empower every Australian restaurant to own their delivery experience, 
@@ -131,7 +131,7 @@ const AboutPage = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="text-center p-6 rounded-xl bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-300">
+              <div key={index} className="text-center p-6 rounded-xl bg-muted hover:bg-card hover:shadow-lg transition-all duration-300 border border-brand-light hover:border-brand-light">
                 <div className="flex justify-center mb-4">
                   {value.icon}
                 </div>
@@ -144,24 +144,24 @@ const AboutPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
+      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Join the Movement?
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-subtle mb-8">
             Join hundreds of Australian restaurants taking control of their delivery experience.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/auth?mode=signup" 
-              className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
+              className="bg-white text-brand px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
             >
               Start Your Free Trial
             </Link>
             <Link 
               href="/contact" 
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-orange-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover-text-brand transition-colors"
             >
               Talk to Our Team
             </Link>

@@ -18,7 +18,7 @@ export default function OrderHeader({ restaurantName, restaurantLogo, orderId }:
           </div>
           <div>
             <h1 className="text-3xl font-bold">{restaurantName}</h1>
-            <p className="text-orange-100">
+            <p className="text-brand-subtle">
               Order #{getOrderDisplayId(orderId)} • Track Your Delivery
             </p>
           </div>

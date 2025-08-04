@@ -19,7 +19,7 @@ const faqCategories = [
     title: 'Getting Started',
     description: 'Everything you need to know to get started with ZoomDishes',
     bgColor: 'from-orange-50 to-red-50',
-    borderColor: 'border-orange-200',
+    borderColor: 'border-brand-light',
     iconBg: 'from-orange-500 to-red-500',
     faqs: [
       {
@@ -182,7 +182,7 @@ const HelpPage = () => {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-orange-50 to-red-50 py-20">
+      <section className="page-gradient py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
             Help <span className="gradient-text">Center</span>
@@ -199,15 +199,15 @@ const HelpPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
             <Link href="/docs/setup-guide">
-              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
-                <Book className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+              <Card className="bg-gray-50 text-center card-hover-orange cursor-pointer">
+                <Book className="w-12 h-12 text-brand mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Setup Guide</h3>
                 <p className="text-gray-600">Step-by-step guide to get started</p>
               </Card>
             </Link>
             
             <Link href="/contact">
-              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
+              <Card className="bg-gray-50 text-center card-hover-orange cursor-pointer">
                 <MessageCircle className="w-12 h-12 text-blue-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Contact Support</h3>
                 <p className="text-gray-600">Get help from our Australian team</p>
@@ -215,7 +215,7 @@ const HelpPage = () => {
             </Link>
             
             <Link href="/pricing">
-              <Card className="bg-gray-50 hover:bg-white hover:shadow-lg text-center transition-all duration-300 border-orange-200 hover:border-orange-300 cursor-pointer">
+              <Card className="bg-gray-50 text-center card-hover-orange cursor-pointer">
                 <DollarSign className="w-12 h-12 text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">View Pricing</h3>
                 <p className="text-gray-600">Simple, transparent pricing</p>
@@ -272,7 +272,7 @@ const HelpPage = () => {
       {/* Still Need Help Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-12 text-white">
+          <div className="btn-brand rounded-2xl p-12 text-white">
             <h2 className="text-4xl font-bold mb-4">Still Need Help?</h2>
             <p className="text-xl opacity-90 mb-8">
               Our Australian support team is here to help you succeed. Get in touch and 
@@ -281,13 +281,13 @@ const HelpPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/contact" 
-                className="inline-flex items-center bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+                className="inline-flex items-center bg-white text-brand px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 hover-scale"
               >
                 Contact Support
               </Link>
               <a 
                 href="mailto:support@zoomdishes.com"
-                className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-orange-600 transition-all duration-300"
+                className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover-text-brand transition-all duration-300"
               >
                 Email Us Direct
               </a>

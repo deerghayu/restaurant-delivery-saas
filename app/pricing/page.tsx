@@ -62,9 +62,9 @@ const PricingPage = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-lg mx-auto">
-            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl shadow-2xl p-8 border-2 border-orange-500 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl shadow-2xl border-0 bg-card backdrop-blur-sm p-8 border-2 border-brand relative overflow-hidden">
               {/* Popular badge */}
-              <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-bl-xl font-semibold text-sm">
+              <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 text-white px-4 py-2 rounded-bl-xl font-semibold text-sm">
                 Most Popular
               </div>
               
@@ -92,7 +92,7 @@ const PricingPage = () => {
 
               <Link
                 href="/auth?mode=signup"
-                className="w-full block text-center bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full block text-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 text-white px-8 py-4 rounded-xl font-bold text-lg"
               >
                 Start Your Free Trial
               </Link>
@@ -118,7 +118,7 @@ const PricingPage = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-orange-200">
+            <table className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Service</th>
@@ -130,7 +130,7 @@ const PricingPage = () => {
               </thead>
               <tbody>
                 {comparisonData.map((item, index) => (
-                  <tr key={index} className={index === 1 ? 'bg-orange-50 border-l-4 border-orange-500' : ''}>
+                  <tr key={index} className={index === 1 ? 'bg-brand-light border-l-4 border-brand' : ''}>
                     <td className="px-6 py-4 font-semibold text-gray-900">{item.service}</td>
                     <td className="px-6 py-4 text-center">
                       <span className={index === 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}>
@@ -179,7 +179,7 @@ const PricingPage = () => {
             </div>
             
             <div className="text-center p-6">
-              <Zap className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+              <Zap className="w-12 h-12 text-brand mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Quick Setup</h3>
               <p className="text-gray-600">Get started in 5 minutes with our simple onboarding</p>
             </div>
@@ -225,17 +225,17 @@ const PricingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
+      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Keep More of Your Profits?
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-subtle mb-8">
             Join hundreds of Australian restaurants saving thousands every month.
           </p>
           <Link 
             href="/auth?mode=signup" 
-            className="inline-flex items-center bg-white text-orange-600 px-12 py-4 rounded-xl font-bold text-xl hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center bg-white text-brand px-12 py-4 rounded-xl font-bold text-xl hover:bg-gray-100 transition-colors"
           >
             Start Free Trial - No Credit Card Required
           </Link>

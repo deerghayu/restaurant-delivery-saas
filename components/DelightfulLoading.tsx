@@ -21,7 +21,7 @@ const DelightfulLoading: React.FC<DelightfulLoadingProps> = ({
           emoji: '👨‍🍳',
           defaultMessage: 'Preparing something delicious...',
           defaultSubmessage: 'Your kitchen magic is happening!',
-          color: 'text-orange-500',
+          color: 'text-primary',
           bgColor: 'bg-gradient-to-r from-orange-50 to-amber-50'
         };
       case 'delivering':
@@ -97,46 +97,34 @@ const DelightfulLoading: React.FC<DelightfulLoadingProps> = ({
             
             {/* Decorative sparkles */}
             <div className="absolute -top-2 -left-2">
-              <Star className="w-3 h-3 text-yellow-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
+              <Star className="w-3 h-3 text-yellow-400 animate-pulse [animation-delay:0.5s]" />
             </div>
             <div className="absolute -bottom-2 -right-2">
-              <Heart className="w-3 h-3 text-pink-400 animate-pulse" style={{ animationDelay: '1s' }} />
+              <Heart className="w-3 h-3 text-pink-400 animate-pulse [animation-delay:1s]" />
             </div>
             <div className="absolute -top-2 -right-2">
-              <Zap className="w-3 h-3 text-blue-400 animate-pulse" style={{ animationDelay: '1.5s' }} />
+              <Zap className="w-3 h-3 text-blue-400 animate-pulse [animation-delay:1.5s]" />
             </div>
           </div>
         </div>
 
         {/* Messages */}
         <div className="space-y-2">
-          <h3 className={`${currentSize.title} font-bold text-gray-900`}>
+          <h3 className={`${currentSize.title} font-bold text-foreground`}>
             {message || content.defaultMessage}
           </h3>
-          <p className={`${currentSize.subtitle} text-gray-600 font-medium`}>
+          <p className={`${currentSize.subtitle} text-muted-foreground font-medium`}>
             {submessage || content.defaultSubmessage}
           </p>
         </div>
 
         {/* Progress bar animation */}
-        <div className="mt-6 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div className="mt-6 w-full bg-muted rounded-full h-2 overflow-hidden">
           <div 
-            className={`h-full bg-gradient-to-r ${content.color.replace('text-', 'from-')} to-transparent rounded-full animate-pulse`}
-            style={{
-              width: '60%',
-              animation: 'progress 2s ease-in-out infinite alternate'
-            }}
+            className={`h-full bg-gradient-to-r ${content.color.replace('text-', 'from-')} to-transparent rounded-full animate-pulse w-3/5`}
           />
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes progress {
-          0% { width: 30%; }
-          50% { width: 70%; }
-          100% { width: 90%; }
-        }
-      `}</style>
     </div>
   );
 };

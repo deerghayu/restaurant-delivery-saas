@@ -17,7 +17,7 @@ const PrivacyPage = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50 to-red-50 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Shield className="w-16 h-16 text-orange-600 mx-auto mb-6" />
+          <Shield className="w-16 h-16 text-brand mx-auto mb-6" />
           <h1 className="text-5xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
           <p className="text-xl text-gray-700 leading-relaxed">
             Your privacy is important to us. Learn how we collect, use, and protect your information.
@@ -35,9 +35,9 @@ const PrivacyPage = () => {
           <div className="prose prose-lg max-w-none">
             
             {/* Introduction */}
-            <div className="bg-orange-50 rounded-xl p-8 mb-12 border border-orange-200">
+            <div className="bg-brand-light rounded-xl p-8 mb-12 border border-brand-light">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                <Eye className="w-6 h-6 text-orange-600 mr-3" />
+                <Eye className="w-6 h-6 text-brand mr-3" />
                 Introduction
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -159,7 +159,7 @@ const PrivacyPage = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">5. Your Privacy Rights</h2>
               
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                <div className="bg-brand-light rounded-lg p-6 border border-brand-light">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">Access & Control</h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-1">
                     <li>Access your personal data</li>
@@ -212,7 +212,7 @@ const PrivacyPage = () => {
             {/* Contact Information */}
             <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-8 text-white">
               <h2 className="text-3xl font-bold mb-4">Questions About Privacy?</h2>
-              <p className="text-orange-100 mb-6">
+              <p className="text-brand-subtle mb-6">
                 If you have any questions about this Privacy Policy or how we handle your data, 
                 please don't hesitate to contact us.
               </p>

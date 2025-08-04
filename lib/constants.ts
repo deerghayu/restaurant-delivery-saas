@@ -60,7 +60,7 @@ export const ORDER_STATUS_CONFIG = {
     nextStatus: 'preparing'
   },
   preparing: { 
-    color: 'bg-orange-100 text-orange-800 border-orange-200', 
+    color: 'bg-brand-light text-brand-dark border-brand-light', 
     label: 'Preparing',
     nextStatus: 'ready'
   },
