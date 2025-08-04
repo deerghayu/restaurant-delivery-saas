@@ -269,11 +269,11 @@ export default function DriversPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'bg-green-100 text-green-800 border-green-200';
-      case 'busy': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'delivering': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'offline': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'available': return 'bg-accent text-accent-foreground border-border';
+      case 'busy': return 'bg-secondary text-secondary-foreground border-border';
+      case 'delivering': return 'bg-primary text-primary-foreground border-border';
+      case 'offline': return 'bg-muted text-muted-foreground border-border';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -290,7 +290,7 @@ export default function DriversPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <div className="min-h-screen bg-orange-50 flex items-center justify-center">
           <DelightfulLoading 
             type="delivering"
             message="Loading your delivery family..."
@@ -343,56 +343,56 @@ export default function DriversPage() {
 
           {/* Driver Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-sm p-4 border border-blue-100">
+            <div className="bg-card rounded-lg shadow-sm p-4 border">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{drivers.length}</p>
-                  <p className="text-sm text-blue-600 font-medium">Total Drivers</p>
+                  <p className="text-2xl font-bold text-foreground">{drivers.length}</p>
+                  <p className="text-sm text-primary font-medium">Total Drivers</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm p-4 border border-green-100">
+            <div className="bg-card rounded-lg shadow-sm p-4 border">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-accent-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {drivers.filter(d => d.status === 'available').length}
                   </p>
-                  <p className="text-sm text-green-600 font-medium">Available Now</p>
+                  <p className="text-sm text-accent-foreground font-medium">Available Now</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg shadow-sm p-4 border border-purple-100">
+            <div className="bg-card rounded-lg shadow-sm p-4 border">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                  <Car className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                  <Car className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {drivers.filter(d => d.status === 'delivering').length}
                   </p>
-                  <p className="text-sm text-purple-600 font-medium">Out for Delivery</p>
+                  <p className="text-sm text-primary font-medium">Out for Delivery</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg shadow-sm p-4 border border-gray-100">
+            <div className="bg-card rounded-lg shadow-sm p-4 border">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gray-400 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {drivers.filter(d => d.status === 'offline').length}
                   </p>
-                  <p className="text-sm text-gray-600 font-medium">Offline</p>
+                  <p className="text-sm text-muted-foreground font-medium">Offline</p>
                 </div>
               </div>
             </div>
@@ -425,7 +425,7 @@ export default function DriversPage() {
                 {drivers.map((driver, index) => (
                   <div 
                     key={driver.id} 
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -433,10 +433,10 @@ export default function DriversPage() {
                           <div className="w-14 h-14 bg-brand-light rounded-full flex items-center justify-center text-xl">
                             {driver.avatar_emoji}
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                            driver.status === 'available' ? 'bg-green-400' :
-                            driver.status === 'delivering' ? 'bg-blue-400' :
-                            driver.status === 'busy' ? 'bg-yellow-400' : 'bg-gray-400'
+                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-card ${
+                            driver.status === 'available' ? 'bg-accent' :
+                            driver.status === 'delivering' ? 'bg-primary' :
+                            driver.status === 'busy' ? 'bg-secondary' : 'bg-muted'
                           }`}></div>
                         </div>
                         <div className="flex-1">
@@ -502,7 +502,7 @@ export default function DriversPage() {
                             variant="ghost"
                             size="sm"
                             title="Edit driver"
-                            className="p-2 text-blue-600 hover:bg-blue-100"
+                            className="p-2 text-primary hover:bg-primary/10"
                           >
                             <Edit3 className="w-4 h-4 mr-1" />
                             Edit
@@ -513,7 +513,7 @@ export default function DriversPage() {
                             variant="ghost"
                             size="sm"
                             title="Remove driver"
-                            className="p-2 text-red-600 hover:bg-red-100"
+                            className="p-2 text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="w-4 h-4 mr-1" />
                             Delete
@@ -581,7 +581,7 @@ export default function DriversPage() {
         {showDeleteModal && driverToDelete && (
           <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-              <div className="bg-red-500 text-white px-6 py-4 rounded-t-xl">
+              <div className="bg-destructive text-destructive-foreground px-6 py-4 rounded-t-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                     <Trash2 className="w-6 h-6 text-white" />

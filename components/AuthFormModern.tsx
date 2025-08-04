@@ -268,11 +268,11 @@ export default function AuthFormModern({ mode, onToggleMode, onSuccess }: AuthFo
       </Card>
 
       {/* Demo Info */}
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-accent border-border">
         <CardContent className="p-4 text-center">
-          <p className="text-sm text-blue-800">
-            <strong>Demo Account:</strong> Use <code className="bg-blue-100 px-1 rounded">demo@zoomdishes.com</code> 
-            with password <code className="bg-blue-100 px-1 rounded">demo123</code>
+          <p className="text-sm text-accent-foreground">
+            <strong>Demo Account:</strong> Use <code className="bg-muted px-1 rounded">demo@zoomdishes.com</code> 
+            with password <code className="bg-muted px-1 rounded">demo123</code>
           </p>
         </CardContent>
       </Card>

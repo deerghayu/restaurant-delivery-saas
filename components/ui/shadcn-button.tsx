@@ -20,9 +20,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         // Custom variants for your brand
         orange: "btn-brand",
-        success: "bg-green-500 hover:bg-green-600 text-white shadow-md",
-        warning: "bg-yellow-500 hover:bg-yellow-600 text-white shadow-md",
-        info: "bg-blue-500 hover:bg-blue-600 text-white shadow-md",
+        success: "bg-accent text-accent-foreground hover:bg-accent/80 shadow-md",
+        warning: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-md",
+        info: "bg-primary text-primary-foreground hover:bg-primary/80 shadow-md",
       },
       size: {
         default: "h-10 px-4 py-2",

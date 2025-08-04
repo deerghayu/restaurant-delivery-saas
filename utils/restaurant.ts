@@ -42,10 +42,10 @@ export const hasCompleteAddress = (restaurant: Restaurant): boolean => {
 };
 
 /**
- * Get brand color with fallback
+ * Get brand color with fallback to CSS variable
  */
 export const getBrandColor = (restaurant: Restaurant | null): string => {
-  return restaurant?.primary_color || '#ea580c';
+  return restaurant?.primary_color || 'var(--brand-primary-hex)';
 };
 
 /**

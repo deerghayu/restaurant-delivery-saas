@@ -44,7 +44,7 @@ export default function SettingsPage() {
     suburb: restaurant?.suburb || '',
     state: restaurant?.state || '',
     logo_url: restaurant?.logo_url || '',
-    primary_color: restaurant?.primary_color || '#FF6B35',
+    primary_color: restaurant?.primary_color || '#ea580c',
     phone: restaurant?.phone || ''
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                                   type="text"
                                   value={formData.primary_color}
                                   onChange={(e) => updateFormData('primary_color', e.target.value)}
-                                  placeholder="#FF6B35"
+                                  placeholder="#ea580c"
                                 />
                               </div>
                             </div>

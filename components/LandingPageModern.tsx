@@ -31,32 +31,32 @@ const LandingPageModern = () => {
 
   const features = [
     {
-      icon: <Smartphone className="w-8 h-8 text-orange-500" />,
+      icon: <Smartphone className="w-8 h-8 text-primary" />,
       title: "Branded Tracking Experience",
       description: "Your customers see YOUR brand, not ours. Custom tracking pages at yourrestaurant.com/track",
     },
     {
-      icon: <DollarSign className="w-8 h-8 text-green-500" />,
+      icon: <DollarSign className="w-8 h-8 text-accent-foreground" />,
       title: "Predictable Pricing",
       description: "Fixed monthly plans starting at $49. No per-delivery fees or hidden charges.",
     },
     {
-      icon: <Zap className="w-8 h-8 text-blue-500" />,
+      icon: <Zap className="w-8 h-8 text-primary" />,
       title: "5-Minute Setup",
       description: "No engineers needed. Simple walkthrough gets you delivering in minutes.",
     },
     {
-      icon: <Users className="w-8 h-8 text-purple-500" />,
+      icon: <Users className="w-8 h-8 text-secondary-foreground" />,
       title: "Perfect for Small Teams",
       description: "Built for restaurants with 1-3 drivers. Everything you need, nothing you don't.",
     },
     {
-      icon: <MapPin className="w-8 h-8 text-red-500" />,
+      icon: <MapPin className="w-8 h-8 text-primary" />,
       title: "Real-Time Tracking",
       description: "Your customers know exactly where their food is, reducing calls and complaints.",
     },
     {
-      icon: <Shield className="w-8 h-8 text-teal-500" />,
+      icon: <Shield className="w-8 h-8 text-accent-foreground" />,
       title: "Australian Made",
       description: "Built by Aussies, for Aussies. Local support and understanding of your market.",
     },

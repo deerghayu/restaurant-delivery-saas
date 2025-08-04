@@ -50,47 +50,47 @@ export const VEHICLE_TYPES = [
 // Order Status Configuration
 export const ORDER_STATUS_CONFIG = {
   pending: { 
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+    color: 'bg-muted text-muted-foreground border-border', 
     label: 'Pending',
     nextStatus: 'confirmed'
   },
   confirmed: { 
-    color: 'bg-blue-100 text-blue-800 border-blue-200', 
+    color: 'bg-accent text-accent-foreground border-border', 
     label: 'Confirmed',
     nextStatus: 'preparing'
   },
   preparing: { 
-    color: 'bg-brand-light text-brand-dark border-brand-light', 
+    color: 'bg-primary/10 text-primary border-border', 
     label: 'Preparing',
     nextStatus: 'ready'
   },
   ready: { 
-    color: 'bg-green-100 text-green-800 border-green-200', 
+    color: 'bg-accent text-accent-foreground border-border', 
     label: 'Ready',
     nextStatus: 'assigned'
   },
   assigned: { 
-    color: 'bg-purple-100 text-purple-800 border-purple-200', 
+    color: 'bg-secondary text-secondary-foreground border-border', 
     label: 'Assigned',
     nextStatus: 'picked_up'
   },
   picked_up: { 
-    color: 'bg-indigo-100 text-indigo-800 border-indigo-200', 
+    color: 'bg-primary text-primary-foreground border-border', 
     label: 'Picked Up',
     nextStatus: 'out_for_delivery'
   },
   out_for_delivery: { 
-    color: 'bg-blue-100 text-blue-800 border-blue-200', 
+    color: 'bg-primary text-primary-foreground border-border', 
     label: 'Out for Delivery',
     nextStatus: 'delivered'
   },
   delivered: { 
-    color: 'bg-green-100 text-green-800 border-green-200', 
+    color: 'bg-accent text-accent-foreground border-border', 
     label: 'Delivered',
     nextStatus: null
   },
   cancelled: { 
-    color: 'bg-red-100 text-red-800 border-red-200', 
+    color: 'bg-destructive text-destructive-foreground border-border', 
     label: 'Cancelled',
     nextStatus: null
   }
@@ -99,19 +99,19 @@ export const ORDER_STATUS_CONFIG = {
 // Driver Status Configuration
 export const DRIVER_STATUS_CONFIG = {
   offline: { 
-    color: 'bg-gray-100 text-gray-800 border-gray-200', 
+    color: 'bg-muted text-muted-foreground border-border', 
     label: 'Offline' 
   },
   available: { 
-    color: 'bg-green-100 text-green-800 border-green-200', 
+    color: 'bg-accent text-accent-foreground border-border', 
     label: 'Available' 
   },
   busy: { 
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+    color: 'bg-secondary text-secondary-foreground border-border', 
     label: 'Busy' 
   },
   delivering: { 
-    color: 'bg-blue-100 text-blue-800 border-blue-200', 
+    color: 'bg-primary text-primary-foreground border-border', 
     label: 'Delivering' 
   }
 } as const;

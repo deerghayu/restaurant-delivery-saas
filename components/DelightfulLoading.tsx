@@ -22,31 +22,31 @@ const DelightfulLoading: React.FC<DelightfulLoadingProps> = ({
           defaultMessage: 'Preparing something delicious...',
           defaultSubmessage: 'Your kitchen magic is happening!',
           color: 'text-primary',
-          bgColor: 'bg-gradient-to-r from-orange-50 to-amber-50'
+          bgColor: 'bg-orange-50'
         };
       case 'delivering':
         return {
           emoji: '🚗',
           defaultMessage: 'Your delivery heroes are on the move...',
           defaultSubmessage: 'Spreading joy, one order at a time!',
-          color: 'text-blue-500',
-          bgColor: 'bg-gradient-to-r from-blue-50 to-sky-50'
+          color: 'text-primary',
+          bgColor: 'bg-card'
         };
       case 'success':
         return {
           emoji: '🎉',
           defaultMessage: 'Amazing work!',
           defaultSubmessage: 'Your customers are going to love this!',
-          color: 'text-green-500',
-          bgColor: 'bg-gradient-to-r from-green-50 to-emerald-50'
+          color: 'text-accent-foreground',
+          bgColor: 'bg-accent'
         };
       default:
         return {
           emoji: '✨',
           defaultMessage: 'Creating something wonderful...',
           defaultSubmessage: 'Just a moment while we work our magic!',
-          color: 'text-purple-500',
-          bgColor: 'bg-gradient-to-r from-purple-50 to-pink-50'
+          color: 'text-secondary-foreground',
+          bgColor: 'bg-secondary'
         };
     }
   };
@@ -97,13 +97,13 @@ const DelightfulLoading: React.FC<DelightfulLoadingProps> = ({
             
             {/* Decorative sparkles */}
             <div className="absolute -top-2 -left-2">
-              <Star className="w-3 h-3 text-yellow-400 animate-pulse [animation-delay:0.5s]" />
+              <Star className="w-3 h-3 text-primary animate-pulse [animation-delay:0.5s]" />
             </div>
             <div className="absolute -bottom-2 -right-2">
-              <Heart className="w-3 h-3 text-pink-400 animate-pulse [animation-delay:1s]" />
+              <Heart className="w-3 h-3 text-primary animate-pulse [animation-delay:1s]" />
             </div>
             <div className="absolute -top-2 -right-2">
-              <Zap className="w-3 h-3 text-blue-400 animate-pulse [animation-delay:1.5s]" />
+              <Zap className="w-3 h-3 text-primary animate-pulse [animation-delay:1.5s]" />
             </div>
           </div>
         </div>

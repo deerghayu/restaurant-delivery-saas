@@ -140,7 +140,7 @@ const OrderStatusBoard = ({ newOrder, onNewOrderClick }: OrderStatusBoardProps) 
       case "confirmed": return "info";
       case "preparing": return "warning";
       case "ready": return "success";
-      case "delivering": return "orange" as any;
+      case "delivering": return "orange";
       case "delivered": return "success";
       case "cancelled": return "destructive";
       default: return "secondary";

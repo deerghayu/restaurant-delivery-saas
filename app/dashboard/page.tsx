@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from "@/components/modern/DashboardHeader";
-import OrderStatusBoard from "@/components/modern/OrderStatusBoard";
+import DashboardHeader from "@/components/DashboardHeader";
+import OrderStatusBoard from "@/components/OrderStatusBoard";
 import { 
   Dialog, 
   DialogContent, 
